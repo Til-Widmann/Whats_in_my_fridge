@@ -1,0 +1,30 @@
+Sehr geehrte Damen und Herren,
+hier ist mein Code für Ihren Wettbewerb.
+
+Die mitgelieferte .jar file Whats_in_my_fridge ist das vollständige Programm.
+Die database file muss zum funktionieren immer im selben Ordner bleiben.
+Auf der Datenbank liegen schon einige Beispieldaten zum Testen. Es können jedoch auch noch weitere hinzugefügt werden.
+Aufgrund fehlender Zeit konnte ich am Ende nicht mehr die Menge an Tests durchführen, wie ich gerne hätte.
+Ich freue mich dennoch sehr auf Ihr Feedback und hoffe, dass Sie mir noch einige Tipps geben können.
+
+
+Unterstützte Befehle:
+-addFood        Legt Lebensmittel in den Kühlschrank zum Beenden der Eingabe bei "name" oder "menge" "end" eingeben
+-addRecipe      Fügt neues Rezept hinzu
+-cook           Kocht das Rezept, welches man eingibt
+-cookable       Zeigt alle Rezepte an die Kochbar sind
+-showAllFood    Zeigt die vorhanden Lebensmittel im Kühlschrank
+-showUsedUpFood Zeigt Lebensmittel an, die schon verbraucht wurden
+-showHistory    Zeigt die Historie von Lebensmittel an (id wird durch showAllFood geliefert)
+-expired        Zeigt alle abgelaufenen Lebensmittel in chronologischer Reihenfolge an
+-expiresIn      Zeigt alle Lebensmittel in chronologischer Reihenfolge an, die innerhalb der gewählten Zeitspanne ablaufen
+
+extra Features:
+-Einspeichern von Ablaufdaten
+-abgelaufene Lebensmittel werden nicht bei der Suche beachtet
+-Ausgabe von abgelaufenen Lebensmitteln
+-Check wann die nächsten Lebensmittel ablaufen
+-beim Kochen eines Rezeptes werden Lebensmittel verwendet, die als nächstes ablaufen
+-mehrere gleiche Lebensmittel werden beachtet und addiert wenn gekocht wird
+-jedes Lebensmittel hat seine eigene Historie mit timestamp und entnommene bzw. hinzugefügte Menge
+

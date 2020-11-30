@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Whats_in_my_fridge:jar">
+    <output-path>$USER_HOME$/Desktop/Whats_in_my_Fridge</output-path>
+    <root id="archive" name="Whats_in_my_fridge.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/../../Whats_in_my_Fridge/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="Whats_in_my_fridge" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../sqlite-jdbc-3.32.3.2.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,377 @@
+package com.company.database;
+
+import com.company.database.dataObjects.FoodItem;
+import com.company.database.dataObjects.History;
+import com.company.database.dataObjects.Ingredient;
+import com.company.database.dataObjects.Recipe;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.LinkedList;
+
+/**
+ * @author Til-W
+ * @version 1.0
+ *
+ * The Database is Specified in the DBConnect class.
+ */
+
+public class SQLiteDBHandler {
+    private Connection c;
+    private Statement stm = null;
+    PreparedStatement prepStm;
+
+
+    /**
+     * Inserts a FoodItem into the Database.
+     * @param foodItem The FoodItem that is to be stored in the database.
+     * @return A int of the Auto-generated id in the database or -1 in case of a database Error.
+     */
+    int insertFoodItem(FoodItem foodItem) {
+        try {
+            c = DBConnect.getConnection();
+
+            prepStm = c.prepareStatement("INSERT INTO FoodItem VALUES(?, ?, ?, ?)");
+            prepStm.setString(2, foodItem.getName());
+            prepStm.setInt(3, foodItem.getAmount());
+            prepStm.setDate(4, Date.valueOf(foodItem.getExpireDate()));
+            prepStm.execute();
+
+            int id = prepStm.getGeneratedKeys().getInt(1);
+
+            insertHistory(new History(
+                    -1,
+                    id,
+                    LocalDateTime.now(),
+                    foodItem.getAmount()
+            ));
+
+            return id;
+        }catch (Exception e) {
+            System.out.println("Error at insertFoodItems: " + e.getMessage());
+            return -1;
+        }finally {
+            close();
+        }
+    }
+
+    /**
+     * Returns all FoodItems equal to input name.
+     * The returned items are ordered by expire date.
+     * @param name The variable name of Food items that are to be returned.
+     * @return A LinkedList of all Matching FoodItems or null in case of a database Error.
+     */
+    LinkedList<FoodItem> getFoodItems( String name) {
+        try{
+            c = DBConnect.getConnection();
+
+            prepStm = c.prepareStatement("SELECT * FROM FoodItem WHERE amount > 0 AND name = ?" +
+                    "ORDER BY expireDate");
+            prepStm.setString(1,name);
+
+            ResultSet rs = prepStm.executeQuery();
+
+
+            LinkedList<FoodItem> foodItems = new LinkedList<>();
+            while (rs.next()) {
+                foodItems.add(new FoodItem(
+                        rs.getInt(1),
+                        rs.getString(2),
+                        rs.getInt(3),
+                        rs.getDate(4).toLocalDate()
+                ));
+            }
+            return foodItems;
+        } catch (Exception e) {
+            System.out.println("Error at getFoodItems " + e.getMessage());
+            return null;
+        }finally {
+            close();
+        }
+    }
+
+    /**
+     * Returns All FoodItems which have a amount > 0.
+     * @return A LinkedList of FoodItems or null in case of a database Error.
+     */
+    LinkedList<FoodItem> getAllExistingFoodItems() {
+        try{
+            c = DBConnect.getConnection();
+            this.stm = c.createStatement();
+            ResultSet rs = stm.executeQuery("SELECT * FROM FoodItem WHERE amount > 0");
+
+            LinkedList<FoodItem> foodItems = new LinkedList<>();
+            while (rs.next()) {
+                foodItems.add(new FoodItem(
+                        rs.getInt(1),
+                        rs.getString(2),
+                        rs.getInt(3),
+                        rs.getDate(4).toLocalDate()
+                ));
+            }
+            return foodItems;
+        } catch (Exception e) {
+            System.out.println("Error at getAllExistingFoodItems " + e.getMessage());
+            return null;
+        }finally {
+            close();
+        }
+    }
+
+    /**
+     * Changes the ammount of a specific FoodItem in the database and adds.
+     * After changing the FoodItem it a History item to the database.
+     * @param foodItem The Food item that is to be changed.
+     * @param amount the amount that is added to the FoodItem (can be negative).
+     */
+    void changeFoodItemAmount(FoodItem foodItem, int amount) {
+        try {
+            c = DBConnect.getConnection();
+
+            prepStm = c.prepareStatement("UPDATE FoodItem SET amount = amount + ?  WHERE id = ?");
+            prepStm.setInt(1, amount);
+            prepStm.setInt(2, foodItem.getFoodItemId());
+            prepStm.execute();
+
+
+            insertHistory(new History(
+                    -1,
+                    foodItem.getFoodItemId(),
+                    LocalDateTime.now(),
+                    amount
+            ));
+
+        }catch (Exception e) {
+            System.out.println("Error at changeFoodItemAmount: " + e.getMessage());
+        }finally {
+            close();
+        }
+    }
+
+    /**
+     * Inserts a new Recipe to the databse.
+     * @param recipe The Recipe that is to be added.
+     * @return a int of the autogenerated key in the database or -1 in case of a database Error.
+     */
+    int insertRecipe(Recipe recipe) {
+        try {
+            c = DBConnect.getConnection();
+
+            prepStm = c.prepareStatement("INSERT INTO Recipe (id, name) VALUES (?, ?)");
+            prepStm.setString(2, recipe.getName());
+            prepStm.execute();
+
+
+            return  prepStm.getGeneratedKeys().getInt(1);
+
+
+        } catch (Exception e) {
+            System.out.println("Error at insert Recipe: " + e.getMessage());
+            return -1;
+        }finally {
+            close();
+        }
+
+    }
+
+    /**
+     * Returns the Recipe Object that equals the input name.
+     * @param name Name of Recipe to be returned.
+     * @return Recipe Object with the same name or null in case of database Error.
+     */
+    Recipe getRecipe(String name) {
+        try {
+            c = DBConnect.getConnection();
+
+            prepStm = c.prepareStatement("SELECT * FROM Recipe WHERE name = ?");
+            prepStm.setString(1, name);
+
+            ResultSet rs = prepStm.executeQuery();
+
+            return new Recipe(rs.getInt(1), rs.getString(2));
+
+        } catch (Exception e) {
+            System.out.println("Error at getRecipe: " + e.getMessage());
+            return null;
+        }finally {
+            close();
+        }
+    }
+
+    /**
+     * Gets all Recipes in the database.
+     * @return LinkedList of all Recipe objects or null in case of database Error.
+     */
+    LinkedList<Recipe> getAllRecipes() {
+        try {
+            c = DBConnect.getConnection();
+
+            this.stm = c.createStatement();
+            ResultSet rs = stm.executeQuery("SELECT * FROM Recipe");
+
+            LinkedList<Recipe> recipes = new LinkedList<>();
+            while (rs.next())  {
+                recipes.add(new Recipe(
+                        rs.getInt("id"),
+                        rs.getString("name")
+                ));
+            }
+            return recipes;
+        } catch (Exception e) {
+            System.out.println("Error at getAllRecipes: " + e.getMessage());
+            return null;
+        }finally {
+            close();
+        }
+    }
+
+    /**
+     * Inserts a new ingredient into the database.
+     * @param ingredient ingredient object that is to be inserted.
+     */
+    void insertIngredient (Ingredient ingredient) {
+        try {
+            c = DBConnect.getConnection();
+
+            prepStm = c.prepareStatement("INSERT INTO Ingredient (id, name, amount, recipeId) " +
+                    "VALUES (?, ?, ?, ?)");
+
+            prepStm.setString(2, ingredient.getName());
+            prepStm.setInt(3, ingredient.getAmount());
+            prepStm.setInt(4, ingredient.getRecipeId());
+            prepStm.execute();
+
+        } catch (Exception e) {
+            System.out.println("Error at insertIngredient : " + e.getMessage());
+        }finally {
+            close();
+        }
+    }
+
+    /**
+     * Returns all Ingredients of a specific Recipe.
+     * @param recipeId id of Recipe used to search for corresponding Ingredients.
+     * @return A LinkedList including all Ingredients of Recipe or null in case of database Error.
+     */
+    LinkedList<Ingredient> getAllIngredientsOf(int recipeId) {
+        try {
+            c = DBConnect.getConnection();
+
+            prepStm = c.prepareStatement("SELECT * FROM Ingredient WHERE recipeId = ?");
+            prepStm.setInt(1, recipeId);
+
+            ResultSet rs = prepStm.executeQuery();
+
+            LinkedList<Ingredient> ingredients = new LinkedList<>();
+            while (rs.next()) {
+                ingredients.add(new Ingredient(
+                        rs.getInt(1),
+                        rs.getString(2),
+                        rs.getInt(3),
+                        rs.getInt(4)
+                ));
+            }
+            return ingredients;
+        }catch (Exception e) {
+            System.out.println("Error at getAllIngredientsOf: " + e.getMessage());
+            return null;
+        }finally {
+            close();
+        }
+    }
+
+    /**
+     * Returns all FoodItems in the database that are used up (amount == 0)
+     * @return A LinkedList with all used up FoodItems
+     */
+    LinkedList<FoodItem> getAllUsedUpFoodItems() {
+        try{
+            c = DBConnect.getConnection();
+            this.stm = c.createStatement();
+            ResultSet rs = stm.executeQuery("SELECT * FROM FoodItem WHERE amount = 0");
+
+            LinkedList<FoodItem> foodItems = new LinkedList<>();
+            while (rs.next()) {
+                foodItems.add(new FoodItem(
+                        rs.getInt(1),
+                        rs.getString(2),
+                        rs.getInt(3),
+                        rs.getDate(4).toLocalDate()
+                ));
+            }
+            return foodItems;
+        } catch (Exception e) {
+            System.out.println("Error at getAllUsedUpFoodItems " + e.getMessage());
+            return null;
+        }finally {
+            close();
+        }
+
+    }
+
+    /**
+     * Inserts a History object into the database.
+     * @param history The history object that is to be inserted.
+     * @return a int of the autogenerated key in the database or -1 in case of a database Error.
+     */
+    int insertHistory(History history) {
+        try {
+            c = DBConnect.getConnection();
+
+            prepStm = c.prepareStatement("INSERT INTO History VALUES (?, ?, ?, ?)");
+            prepStm.setInt(2, history.getFoodItemid());
+            prepStm.setTimestamp(3, Timestamp.valueOf(history.getUseDate()));
+            prepStm.setInt(4, history.getAmount());
+            prepStm.execute();
+
+            return prepStm.getGeneratedKeys().getInt(1);
+
+        } catch (Exception e) {
+            System.out.println("Error at insertHistory: " + e.getMessage());
+            return -1;
+        }finally {
+            close();
+        }
+    }
+
+    /**
+     * Returns all History entries of specific FoodItem.
+     * @param foodItemId The FoodItem id which is used to search corresponding History entries.
+     * @return A LinkedList of all matching History entries.
+     */
+     LinkedList<History> getHistoryOf(int foodItemId) {
+        try {
+            c = DBConnect.getConnection();
+
+            prepStm = c.prepareStatement("SELECT * FROM History WHERE FoodItemId = ? ORDER BY useDate");
+            prepStm.setInt(1, foodItemId);
+            ResultSet rs = prepStm.executeQuery();
+
+            LinkedList<History> histories = new LinkedList<>();
+            while (rs.next()) {
+                histories.add(new History(
+                        rs.getInt("id"),
+                        rs.getInt("FoodItemId"),
+                        rs.getTimestamp("useDate").toLocalDateTime(),
+                        rs.getInt("amount")
+                ));
+            }
+            return histories;
+        }catch (Exception e) {
+            System.out.println("Error at getHistoryOf: " + e.getMessage());
+            return null;
+        }finally {
+            close();
+        }
+    }
+
+    /**
+     * Closes the current Connection to the database.
+     */
+     void close(){
+        try {
+            c.close();
+        } catch (Exception e) {
+            System.out.println("Error at close: " + e.getMessage());
+        }
+    }
+}
