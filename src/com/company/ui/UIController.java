@@ -71,12 +71,12 @@ public class UIController {
                     break;
 
                 case "showAllFood":
-                    refrigeratorController.getAllFoodItems(0)
+                    refrigeratorController.getAllFoodItems(RefrigeratorController.SelectFoodItem.EXISTING)
                             .forEach(a -> System.out.println(a));
                     break;
 
                 case "showUsedUpFood":
-                    refrigeratorController.getAllFoodItems(1)
+                    refrigeratorController.getAllFoodItems(RefrigeratorController.SelectFoodItem.USED_UP)
                             .forEach(a -> System.out.println(a));
                     break;
 

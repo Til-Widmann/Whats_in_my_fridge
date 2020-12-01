@@ -25,6 +25,12 @@ public class Ingredient {
         this.amount = amount;
         this.recipeId = recipeId;
     }
+    public Ingredient(String name, int amount, int recipeId){
+        this.id = -1;
+        this.name = name;
+        this.amount = amount;
+        this.recipeId = recipeId;
+    }
 
     public int getId() {
         return id;

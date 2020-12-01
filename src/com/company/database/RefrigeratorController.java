@@ -29,7 +29,6 @@ public class RefrigeratorController {
         int amount =  Integer.parseInt(foodItem[1]);
 
         insertFoodItem(new FoodItem(
-                -1,
                 foodItem[0],
                 amount,
                 dateFormatter(foodItem[2])
@@ -42,7 +41,7 @@ public class RefrigeratorController {
      * @return  FoodItem with equal id or null if there is no such item
      */
     public FoodItem getFoodItemFromId(int id) {
-        List<FoodItem> foodItems = getAllFoodItems(2);
+        List<FoodItem> foodItems = getAllFoodItems(SelectFoodItem.ALL);
         for(FoodItem item : foodItems) {
             if (item.getFoodItemId() == id)
                 return item;
@@ -57,7 +56,6 @@ public class RefrigeratorController {
      * @return  true if there is enough in the storage so the change is successfull
      */
     public boolean removeAmountOfFoodItem(String name, int amount) {
-        SQLiteDBHandler db = new SQLiteDBHandler();
 
         List<FoodItem> matchingFoodItems = getFoodItems(name);
 
@@ -111,31 +109,34 @@ public class RefrigeratorController {
 
         LocalDate maxDate = LocalDate.now().plusDays(days);
 
-        return getAllFoodItems(0)
+        return getAllFoodItems(SelectFoodItem.EXISTING)
                 .stream()
                 .filter(a -> a.getExpireDate().isBefore(maxDate))
                 .sorted(Comparator.comparing(FoodItem::getExpireDate))
                 .collect(Collectors.toList());
     }
 
+
+    public enum SelectFoodItem {
+        ALL,USED_UP,EXISTING
+    }
     /**
      * Returns foodItems in database
-     * @param mode  Mode 0 = Food that is left in the Refrigerator (amount != 0)
-     *              Mode 1 = Food that was in the Refrigerator but ist now used up (amount = 0)
-     *              Mode 2 = Both Food that is or was in the refrigerator
+     * @param mode  Mode EXISTING = Food that is left in the Refrigerator (amount != 0)
+     *              Mode USED_UP = Food that was in the Refrigerator but ist now used up (amount = 0)
+     *              Mode ALL = Both Food that is or was in the refrigerator
      * @return A list of foodItems in database
      */
-    public List<FoodItem> getAllFoodItems(int mode){
-        SQLiteDBHandler db = new SQLiteDBHandler();
+    public List<FoodItem> getAllFoodItems(SelectFoodItem mode){
         LinkedList<FoodItem> list;
         switch (mode){
-            case 0:
+            case EXISTING:
                 list = getAllExistingFoodItems();
                 break;
-            case 1:
+            case USED_UP:
                 list = getAllUsedUpFoodItems();
                 break;
-            case 2:
+            case ALL:
                 list = getAllExistingFoodItems();
                 list.addAll(getAllUsedUpFoodItems());
                 break;
@@ -151,7 +152,6 @@ public class RefrigeratorController {
      * @return  list of all matching history events
      */
     public LinkedList <History> getHistoryFromId(int id) {
-        SQLiteDBHandler db = new SQLiteDBHandler();
         return HistoryDBHandler.getHistoryOf(id);
     }
 
@@ -162,7 +162,7 @@ public class RefrigeratorController {
      * @return  true if there is enough left
      */
     public boolean amountAvailable(String name, int amount) {
-        List<FoodItem> foodItems = getAllFoodItems(0);
+        List<FoodItem> foodItems = getAllFoodItems(SelectFoodItem.EXISTING);
 
         int availableAmount = foodItems.stream()
                 .filter(a -> a.getName().equals(name))

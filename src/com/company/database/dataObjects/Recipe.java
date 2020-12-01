@@ -19,6 +19,11 @@ public class Recipe {
         this.recipeId = recipeId;
         this.name = name;
     }
+    public Recipe(String name) {
+        this.recipeId = -1;
+        this.name = name;
+    }
+
 
     public int getRecipeId() {
         return recipeId;

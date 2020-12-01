@@ -16,7 +16,7 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
      * @param foodItem The FoodItem that is to be stored in the database.
      * @return A int of the Auto-generated id in the database or -1 in case of a database Error.
      */
-    static int insertFoodItem(FoodItem foodItem) {
+    static void insertFoodItem(FoodItem foodItem) {
         try {
             c = DBConnect.getConnection();
 
@@ -34,10 +34,8 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
                     foodItem.getAmount()
             ));
 
-            return foodItemId;
         }catch (Exception e) {
             e.printStackTrace();
-            return -1;
         }finally {
             close();
         }
@@ -67,6 +65,7 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
             close();
         }
     }
+
     /**
      * Returns All FoodItems which have a amount > 0.
      * @return A LinkedList of FoodItems or null in case of a database Error.
@@ -84,19 +83,6 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
         }finally {
             close();
         }
-    }
-
-    private static LinkedList<FoodItem> getFoodItemObjectListFrom(ResultSet rs) throws SQLException {
-        LinkedList<FoodItem> foodItems = new LinkedList<>();
-        while (rs.next()) {
-            foodItems.add(new FoodItem(
-                    rs.getInt(1),
-                    rs.getString(2),
-                    rs.getInt(3),
-                    rs.getDate(4).toLocalDate()
-            ));
-        }
-        return foodItems;
     }
 
     /**
@@ -143,5 +129,18 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
         }finally {
             close();
         }
+    }
+
+    private static LinkedList<FoodItem> getFoodItemObjectListFrom(ResultSet rs) throws SQLException {
+        LinkedList<FoodItem> foodItems = new LinkedList<>();
+        while (rs.next()) {
+            foodItems.add(new FoodItem(
+                    rs.getInt(1),
+                    rs.getString(2),
+                    rs.getInt(3),
+                    rs.getDate(4).toLocalDate()
+            ));
+        }
+        return foodItems;
     }
 }

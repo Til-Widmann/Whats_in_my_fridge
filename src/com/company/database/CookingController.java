@@ -5,6 +5,7 @@ import com.company.database.dataObjects.Recipe;
 
 import java.util.*;
 
+import static com.company.database.IngredientDBHandler.*;
 import static com.company.database.RecipeDBHandler.*;
 
 /**
@@ -20,12 +21,10 @@ public class CookingController {
      * @param ingredients  a map of Ingredients that corrospond to this Recipe
      */
     public void addRecipe(String name, Map<String, Integer> ingredients) {
-        SQLiteDBHandler db = new SQLiteDBHandler();
 
-        int recipeId = insertRecipe(new Recipe(-1,  name));
+        int recipeId = insertRecipe(new Recipe(name));
 
-        ingredients.forEach((key, value) -> db.insertIngredient(new Ingredient(
-                -1,
+        ingredients.forEach((key, value) -> insertIngredient(new Ingredient(
                 key,
                 value,
                 recipeId
@@ -37,13 +36,12 @@ public class CookingController {
      * @return List of all cookable Recipes
      */
     public List<Recipe> cookableRecipes() {
-        SQLiteDBHandler db = new SQLiteDBHandler();
         List<Recipe> recipes = getAllRecipes();
         RefrigeratorController refrigeratorController = new RefrigeratorController();
         List<Recipe> cookableRecipes = new LinkedList<>();
 
         for (Recipe recipe: recipes) {
-            List<Ingredient> ingredients = db.getAllIngredientsOf(recipe.getRecipeId());
+            List<Ingredient> ingredients = getAllIngredientsOf(recipe.getRecipeId());
             boolean cookable = true;
             for (Ingredient ingredient: ingredients ) {
                 if (!refrigeratorController.amountAvailable(ingredient.getName(), ingredient.getAmount())) {
@@ -64,13 +62,12 @@ public class CookingController {
      * @return returns if Recipe has been cooked correctly
      */
     public boolean cookThisRecipe(String name) {
-        SQLiteDBHandler db = new SQLiteDBHandler();
         Recipe recipe = getRecipe(name);
         if (recipe == null)
             return false;
         RefrigeratorController refrigeratorController = new RefrigeratorController();
 
-        List<Ingredient> ingredients = db.getAllIngredientsOf(recipe.getRecipeId());
+        List<Ingredient> ingredients = getAllIngredientsOf(recipe.getRecipeId());
         for (Ingredient ingredient : ingredients) {
             if (!refrigeratorController.removeAmountOfFoodItem(ingredient.getName(), ingredient.getAmount()))
                 return false;
