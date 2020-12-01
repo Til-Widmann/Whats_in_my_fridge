@@ -4,9 +4,12 @@ import com.company.database.dataObjects.FoodItem;
 import com.company.database.dataObjects.History;
 import com.company.database.dataObjects.Ingredient;
 import com.company.database.dataObjects.Recipe;
+
+import java.io.ObjectInput;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
+import java.util.function.Function;
 
 /**
  * @author Til-W
@@ -16,136 +19,9 @@ import java.util.LinkedList;
  */
 
 public class SQLiteDBHandler {
-    private Connection c;
-    private Statement stm = null;
-    PreparedStatement prepStm;
-
-
-    /**
-     * Inserts a FoodItem into the Database.
-     * @param foodItem The FoodItem that is to be stored in the database.
-     * @return A int of the Auto-generated id in the database or -1 in case of a database Error.
-     */
-    int insertFoodItem(FoodItem foodItem) {
-        try {
-            c = DBConnect.getConnection();
-
-            prepStm = c.prepareStatement("INSERT INTO FoodItem VALUES(?, ?, ?, ?)");
-            prepStm.setString(2, foodItem.getName());
-            prepStm.setInt(3, foodItem.getAmount());
-            prepStm.setDate(4, Date.valueOf(foodItem.getExpireDate()));
-            prepStm.execute();
-
-            int id = prepStm.getGeneratedKeys().getInt(1);
-
-            insertHistory(new History(
-                    -1,
-                    id,
-                    LocalDateTime.now(),
-                    foodItem.getAmount()
-            ));
-
-            return id;
-        }catch (Exception e) {
-            System.out.println("Error at insertFoodItems: " + e.getMessage());
-            return -1;
-        }finally {
-            close();
-        }
-    }
-
-    /**
-     * Returns all FoodItems equal to input name.
-     * The returned items are ordered by expire date.
-     * @param name The variable name of Food items that are to be returned.
-     * @return A LinkedList of all Matching FoodItems or null in case of a database Error.
-     */
-    LinkedList<FoodItem> getFoodItems( String name) {
-        try{
-            c = DBConnect.getConnection();
-
-            prepStm = c.prepareStatement("SELECT * FROM FoodItem WHERE amount > 0 AND name = ?" +
-                    "ORDER BY expireDate");
-            prepStm.setString(1,name);
-
-            ResultSet rs = prepStm.executeQuery();
-
-
-            LinkedList<FoodItem> foodItems = new LinkedList<>();
-            while (rs.next()) {
-                foodItems.add(new FoodItem(
-                        rs.getInt(1),
-                        rs.getString(2),
-                        rs.getInt(3),
-                        rs.getDate(4).toLocalDate()
-                ));
-            }
-            return foodItems;
-        } catch (Exception e) {
-            System.out.println("Error at getFoodItems " + e.getMessage());
-            return null;
-        }finally {
-            close();
-        }
-    }
-
-    /**
-     * Returns All FoodItems which have a amount > 0.
-     * @return A LinkedList of FoodItems or null in case of a database Error.
-     */
-    LinkedList<FoodItem> getAllExistingFoodItems() {
-        try{
-            c = DBConnect.getConnection();
-            this.stm = c.createStatement();
-            ResultSet rs = stm.executeQuery("SELECT * FROM FoodItem WHERE amount > 0");
-
-            LinkedList<FoodItem> foodItems = new LinkedList<>();
-            while (rs.next()) {
-                foodItems.add(new FoodItem(
-                        rs.getInt(1),
-                        rs.getString(2),
-                        rs.getInt(3),
-                        rs.getDate(4).toLocalDate()
-                ));
-            }
-            return foodItems;
-        } catch (Exception e) {
-            System.out.println("Error at getAllExistingFoodItems " + e.getMessage());
-            return null;
-        }finally {
-            close();
-        }
-    }
-
-    /**
-     * Changes the ammount of a specific FoodItem in the database and adds.
-     * After changing the FoodItem it a History item to the database.
-     * @param foodItem The Food item that is to be changed.
-     * @param amount the amount that is added to the FoodItem (can be negative).
-     */
-    void changeFoodItemAmount(FoodItem foodItem, int amount) {
-        try {
-            c = DBConnect.getConnection();
-
-            prepStm = c.prepareStatement("UPDATE FoodItem SET amount = amount + ?  WHERE id = ?");
-            prepStm.setInt(1, amount);
-            prepStm.setInt(2, foodItem.getFoodItemId());
-            prepStm.execute();
-
-
-            insertHistory(new History(
-                    -1,
-                    foodItem.getFoodItemId(),
-                    LocalDateTime.now(),
-                    amount
-            ));
-
-        }catch (Exception e) {
-            System.out.println("Error at changeFoodItemAmount: " + e.getMessage());
-        }finally {
-            close();
-        }
-    }
+    protected Connection c;
+    protected Statement stm = null;
+    protected PreparedStatement prepStm;
 
     /**
      * Inserts a new Recipe to the databse.
@@ -170,7 +46,6 @@ public class SQLiteDBHandler {
         }finally {
             close();
         }
-
     }
 
     /**
@@ -305,7 +180,6 @@ public class SQLiteDBHandler {
         }finally {
             close();
         }
-
     }
 
     /**
@@ -367,7 +241,7 @@ public class SQLiteDBHandler {
     /**
      * Closes the current Connection to the database.
      */
-     void close(){
+     protected void close(){
         try {
             c.close();
         } catch (Exception e) {

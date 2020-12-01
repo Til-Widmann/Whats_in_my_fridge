@@ -27,7 +27,6 @@ public class CookingController {
                         a.getKey(),
                         a.getValue(),
                         recipeId
-
                 ))
         );
     }

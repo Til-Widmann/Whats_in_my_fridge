@@ -27,6 +27,12 @@ public class History {
         this.useDate = useDate;
         this.amount = amount;
     }
+    public History( int foodItemid, LocalDateTime useDate, int amount) {
+        this.id = 0;
+        this.foodItemid = foodItemid;
+        this.useDate = useDate;
+        this.amount = amount;
+    }
 
     public int getId() {
         return id;

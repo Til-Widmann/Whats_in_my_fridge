@@ -25,7 +25,6 @@ import java.time.LocalDate;
         this.foodItemId = foodItemId;
         this.name = name;
         this.amount = amount;
-
         this.expireDate = expireDate;
     }
 
