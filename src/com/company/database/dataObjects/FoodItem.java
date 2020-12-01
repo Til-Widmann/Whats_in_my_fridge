@@ -63,26 +63,3 @@ import java.time.LocalDate;
         return formatedFoodItem.toString();
     }
 }
-
-
-    /*
-    @Override
-    public String toString() {
-        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        String dateOfUseString = "not yet used";
-        String expiryDateString = "no expiry date specified";
-        if (dateOfUse != null)
-            dateOfUseString = dateFormat.format(dateOfUse);
-        if (expiryDate != null)
-            expiryDateString = dateFormat.format(expiryDate);
-
-
-        return "FoodItem{\n" +
-                "ingredient=" + ingredient +
-                ",\n dateOfStorage= " + dateFormat.format(dateOfStorage) +
-                ",\n dateOfUse=     " + dateOfUseString +
-                ",\n expiryDate=    " + expiryDateString +
-                '}';
-    }
-}
-*/

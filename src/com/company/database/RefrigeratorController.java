@@ -55,15 +55,11 @@ public class RefrigeratorController {
      * @param amount    amount that should be changed (can be negative)
      * @return  true if there is enough in the storage so the change is successfull
      */
-    public boolean removeAmountOfFoodItem(String name, int amount) {
+    public boolean removeAmountOfFoodItemIfAvailable(String name, int amount) {
 
         List<FoodItem> matchingFoodItems = getFoodItems(name);
 
-        int availableAmount = matchingFoodItems.stream()
-                .mapToInt(i -> i.getAmount())
-                .sum();
-        if (amount > availableAmount)
-            return false;
+        if (!checkIfAmountIsAvailable(amount, matchingFoodItems)) return false;
 
         for (FoodItem item : matchingFoodItems) {
             if (item.getAmount() >= amount) {
@@ -74,6 +70,15 @@ public class RefrigeratorController {
                 changeFoodItemAmount(item, -item.getAmount());
             }
         }
+        return true;
+    }
+
+    private static boolean checkIfAmountIsAvailable(int amount, List<FoodItem> matchingFoodItems) {
+        int availableAmount = matchingFoodItems.stream()
+                .mapToInt(i -> i.getAmount())
+                .sum();
+        if (amount > availableAmount)
+            return false;
         return true;
     }
 
@@ -138,6 +143,7 @@ public class RefrigeratorController {
                 break;
             case ALL:
                 list = getAllExistingFoodItems();
+                assert list != null;
                 list.addAll(getAllUsedUpFoodItems());
                 break;
             default:

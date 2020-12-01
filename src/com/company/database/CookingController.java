@@ -69,7 +69,7 @@ public class CookingController {
 
         List<Ingredient> ingredients = getAllIngredientsOf(recipe.getRecipeId());
         for (Ingredient ingredient : ingredients) {
-            if (!refrigeratorController.removeAmountOfFoodItem(ingredient.getName(), ingredient.getAmount()))
+            if (!refrigeratorController.removeAmountOfFoodItemIfAvailable(ingredient.getName(), ingredient.getAmount()))
                 return false;
         }
         return true;
