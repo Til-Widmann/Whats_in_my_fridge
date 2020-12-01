@@ -4,6 +4,9 @@ import com.company.database.dataObjects.Ingredient;
 import com.company.database.dataObjects.Recipe;
 
 import java.util.*;
+
+import static com.company.database.RecipeDBHandler.*;
+
 /**
  * @author Til-W
  * @version 1.0
@@ -19,16 +22,14 @@ public class CookingController {
     public void addRecipe(String name, Map<String, Integer> ingredients) {
         SQLiteDBHandler db = new SQLiteDBHandler();
 
-        int recipeId = db.insertRecipe(new Recipe(-1,  name));
+        int recipeId = insertRecipe(new Recipe(-1,  name));
 
-        ingredients.entrySet().forEach(a ->
-                db.insertIngredient(new Ingredient(
-                        -1,
-                        a.getKey(),
-                        a.getValue(),
-                        recipeId
-                ))
-        );
+        ingredients.forEach((key, value) -> db.insertIngredient(new Ingredient(
+                -1,
+                key,
+                value,
+                recipeId
+        )));
     }
 
     /**
@@ -37,7 +38,7 @@ public class CookingController {
      */
     public List<Recipe> cookableRecipes() {
         SQLiteDBHandler db = new SQLiteDBHandler();
-        List<Recipe> recipes = db.getAllRecipes();
+        List<Recipe> recipes = getAllRecipes();
         RefrigeratorController refrigeratorController = new RefrigeratorController();
         List<Recipe> cookableRecipes = new LinkedList<>();
 
@@ -64,7 +65,7 @@ public class CookingController {
      */
     public boolean cookThisRecipe(String name) {
         SQLiteDBHandler db = new SQLiteDBHandler();
-        Recipe recipe = db.getRecipe(name);
+        Recipe recipe = getRecipe(name);
         if (recipe == null)
             return false;
         RefrigeratorController refrigeratorController = new RefrigeratorController();

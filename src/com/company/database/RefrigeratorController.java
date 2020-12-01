@@ -6,6 +6,9 @@ import com.company.database.dataObjects.History;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.company.database.FoodItemDBHandler.*;
+
 /**
  * @author Til-W
  * @version 1.0
@@ -22,11 +25,10 @@ public class RefrigeratorController {
      *                 [2] expireDate
      */
     public void addFoodItem(String[] foodItem) {
-        SQLiteDBHandler db = new SQLiteDBHandler();
 
         int amount =  Integer.parseInt(foodItem[1]);
 
-        db.insertFoodItem(new FoodItem(
+        insertFoodItem(new FoodItem(
                 -1,
                 foodItem[0],
                 amount,
@@ -57,7 +59,7 @@ public class RefrigeratorController {
     public boolean removeAmountOfFoodItem(String name, int amount) {
         SQLiteDBHandler db = new SQLiteDBHandler();
 
-        List<FoodItem> matchingFoodItems = db.getFoodItems(name);
+        List<FoodItem> matchingFoodItems = getFoodItems(name);
 
         int availableAmount = matchingFoodItems.stream()
                 .mapToInt(i -> i.getAmount())
@@ -67,11 +69,11 @@ public class RefrigeratorController {
 
         for (FoodItem item : matchingFoodItems) {
             if (item.getAmount() >= amount) {
-                db.changeFoodItemAmount(item, -amount);
+                changeFoodItemAmount(item, -amount);
                 break;
             }else {
                 amount -= item.getAmount();
-                db.changeFoodItemAmount(item, -item.getAmount());
+                changeFoodItemAmount(item, -item.getAmount());
             }
         }
         return true;
@@ -128,14 +130,14 @@ public class RefrigeratorController {
         LinkedList<FoodItem> list;
         switch (mode){
             case 0:
-                list = db.getAllExistingFoodItems();
+                list = getAllExistingFoodItems();
                 break;
             case 1:
-                list = db.getAllUsedUpFoodItems();
+                list = getAllUsedUpFoodItems();
                 break;
             case 2:
-                list = db.getAllExistingFoodItems();
-                list.addAll(db.getAllUsedUpFoodItems());
+                list = getAllExistingFoodItems();
+                list.addAll(getAllUsedUpFoodItems());
                 break;
             default:
                 return null;
@@ -150,7 +152,7 @@ public class RefrigeratorController {
      */
     public LinkedList <History> getHistoryFromId(int id) {
         SQLiteDBHandler db = new SQLiteDBHandler();
-        return db.getHistoryOf(id);
+        return HistoryDBHandler.getHistoryOf(id);
     }
 
     /**

@@ -11,15 +11,12 @@ import java.util.LinkedList;
 
 public class FoodItemDBHandler extends SQLiteDBHandler{
 
-
-
-
     /**
      * Inserts a FoodItem into the Database.
      * @param foodItem The FoodItem that is to be stored in the database.
      * @return A int of the Auto-generated id in the database or -1 in case of a database Error.
      */
-    int insertFoodItem(FoodItem foodItem) {
+    static int insertFoodItem(FoodItem foodItem) {
         try {
             c = DBConnect.getConnection();
 
@@ -31,7 +28,7 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
 
             int foodItemId = prepStm.getGeneratedKeys().getInt(1);
 
-            insertHistory(new History(
+            HistoryDBHandler.insertHistory(new History(
                     foodItemId,
                     LocalDateTime.now(),
                     foodItem.getAmount()
@@ -39,7 +36,7 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
 
             return foodItemId;
         }catch (Exception e) {
-            System.out.println("Error at insertFoodItems: " + e.getMessage());
+            e.printStackTrace();
             return -1;
         }finally {
             close();
@@ -52,7 +49,7 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
      * @param name The variable name of Food items that are to be returned.
      * @return A LinkedList of all Matching FoodItems or null in case of a database Error.
      */
-    LinkedList<FoodItem> getFoodItems(String name) {
+    static LinkedList<FoodItem> getFoodItems(String name) {
         try{
             c = DBConnect.getConnection();
 
@@ -62,10 +59,9 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
 
             ResultSet rs = prepStm.executeQuery();
 
-
-            return getFoodItemsFromResultSet(rs);
+            return getFoodItemObjectListFrom(rs);
         } catch (Exception e) {
-            System.out.println("Error at getFoodItems " + e.getMessage());
+            e.printStackTrace();
             return null;
         }finally {
             close();
@@ -75,14 +71,13 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
      * Returns All FoodItems which have a amount > 0.
      * @return A LinkedList of FoodItems or null in case of a database Error.
      */
-    LinkedList<FoodItem> getAllExistingFoodItems() {
+    static LinkedList<FoodItem> getAllExistingFoodItems() {
         try{
             c = DBConnect.getConnection();
-            this.stm = c.createStatement();
-            ResultSet rs = stm.executeQuery("SELECT * FROM FoodItem WHERE amount > 0");
+            prepStm = c.prepareStatement("SELECT * FROM FoodItem WHERE amount > 0");
+            ResultSet rs = prepStm.executeQuery();
 
-            LinkedList<FoodItem> foodItems = getFoodItemsFromResultSet(rs);
-            return foodItems;
+            return  getFoodItemObjectListFrom(rs);
         } catch (Exception e) {
             System.out.println("Error at getAllExistingFoodItems " + e.getMessage());
             return null;
@@ -91,7 +86,7 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
         }
     }
 
-    private LinkedList<FoodItem> getFoodItemsFromResultSet(ResultSet rs) throws SQLException {
+    private static LinkedList<FoodItem> getFoodItemObjectListFrom(ResultSet rs) throws SQLException {
         LinkedList<FoodItem> foodItems = new LinkedList<>();
         while (rs.next()) {
             foodItems.add(new FoodItem(
@@ -110,7 +105,7 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
      * @param foodItem The Food item that is to be changed.
      * @param amount the amount that is added to the FoodItem (can be negative).
      */
-    void changeFoodItemAmount(FoodItem foodItem, int amount) {
+    static void changeFoodItemAmount(FoodItem foodItem, int amount) {
         try {
             c = DBConnect.getConnection();
 
@@ -119,15 +114,32 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
             prepStm.setInt(2, foodItem.getFoodItemId());
             prepStm.execute();
 
-
-            insertHistory(new History(
+            HistoryDBHandler.insertHistory(new History(
                     foodItem.getFoodItemId(),
                     LocalDateTime.now(),
                     amount
             ));
 
         }catch (Exception e) {
-            System.out.println("Error at changeFoodItemAmount: " + e.getMessage());
+            e.printStackTrace();
+        }finally {
+            close();
+        }
+    }
+    /**
+     * Returns all FoodItems in the database that are used up (amount == 0)
+     * @return A LinkedList with all used up FoodItems
+     */
+    static LinkedList<FoodItem> getAllUsedUpFoodItems() {
+        try{
+            c = DBConnect.getConnection();
+            prepStm = c.prepareStatement("SELECT * FROM FoodItem WHERE amount = 0");
+            ResultSet rs = prepStm.executeQuery();
+
+            return getFoodItemObjectListFrom(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }finally {
             close();
         }
