@@ -3,6 +3,7 @@ package com.company.database;
 import com.company.database.dataObjects.Ingredient;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedList;
 
 public class IngredientDBHandler extends SQLiteDBHandler{
@@ -14,19 +15,21 @@ public class IngredientDBHandler extends SQLiteDBHandler{
         try {
             c = DBConnect.getConnection();
 
-            prepStm = c.prepareStatement("INSERT INTO Ingredient (id, name, amount, recipeId) " +
-                    "VALUES (?, ?, ?, ?)");
-
-            prepStm.setString(2, ingredient.getName());
-            prepStm.setInt(3, ingredient.getAmount());
-            prepStm.setInt(4, ingredient.getRecipeId());
-            prepStm.execute();
-
+            insertIngredientQuery(ingredient);
         } catch (Exception e) {
-            System.out.println("Error at insertIngredient : " + e.getMessage());
+            e.printStackTrace();
         }finally {
             close();
         }
+    }
+
+    private static void insertIngredientQuery(Ingredient ingredient) throws SQLException {
+        prepStm = c.prepareStatement("INSERT INTO Ingredient (id, name, amount, recipeId) " +
+                "VALUES (?, ?, ?, ?)");
+        prepStm.setString(2, ingredient.getName());
+        prepStm.setInt(3, ingredient.getAmount());
+        prepStm.setInt(4, ingredient.getRecipeId());
+        prepStm.execute();
     }
 
     /**
@@ -38,26 +41,34 @@ public class IngredientDBHandler extends SQLiteDBHandler{
         try {
             c = DBConnect.getConnection();
 
-            prepStm = c.prepareStatement("SELECT * FROM Ingredient WHERE recipeId = ?");
-            prepStm.setInt(1, recipeId);
+            ResultSet rs = getAllIngredientsOfQuery(recipeId);
 
-            ResultSet rs = prepStm.executeQuery();
-
-            LinkedList<Ingredient> ingredients = new LinkedList<>();
-            while (rs.next()) {
-                ingredients.add(new Ingredient(
-                        rs.getInt(1),
-                        rs.getString(2),
-                        rs.getInt(3),
-                        rs.getInt(4)
-                ));
-            }
-            return ingredients;
+            return getIngredientsFrom(rs);
         }catch (Exception e) {
-            System.out.println("Error at getAllIngredientsOf: " + e.getMessage());
+            e.printStackTrace();
             return null;
         }finally {
             close();
         }
+    }
+
+    private static ResultSet getAllIngredientsOfQuery(int recipeId) throws SQLException {
+        prepStm = c.prepareStatement("SELECT * FROM Ingredient WHERE recipeId = ?");
+        prepStm.setInt(1, recipeId);
+
+        return prepStm.executeQuery();
+    }
+
+    private static LinkedList<Ingredient> getIngredientsFrom(ResultSet rs) throws SQLException {
+        LinkedList<Ingredient> ingredients = new LinkedList<>();
+        while (rs.next()) {
+            ingredients.add(new Ingredient(
+                    rs.getInt(1),
+                    rs.getString(2),
+                    rs.getInt(3),
+                    rs.getInt(4)
+            ));
+        }
+        return ingredients;
     }
 }

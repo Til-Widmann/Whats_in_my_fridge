@@ -19,26 +19,27 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
     static void insertFoodItem(FoodItem foodItem) {
         try {
             c = DBConnect.getConnection();
-
-            prepStm = c.prepareStatement("INSERT INTO FoodItem VALUES(?, ?, ?, ?)");
-            prepStm.setString(2, foodItem.getName());
-            prepStm.setInt(3, foodItem.getAmount());
-            prepStm.setDate(4, Date.valueOf(foodItem.getExpireDate()));
-            prepStm.execute();
-
-            int foodItemId = prepStm.getGeneratedKeys().getInt(1);
-
-            HistoryDBHandler.insertHistory(new History(
-                    foodItemId,
-                    LocalDateTime.now(),
-                    foodItem.getAmount()
-            ));
-
+            insertFoodItemQuery(foodItem);
         }catch (Exception e) {
             e.printStackTrace();
         }finally {
             close();
         }
+    }
+
+    private static void insertFoodItemQuery(FoodItem foodItem) throws SQLException {
+        prepStm = c.prepareStatement("INSERT INTO FoodItem VALUES(?, ?, ?, ?)");
+        prepStm.setString(2, foodItem.getName());
+        prepStm.setInt(3, foodItem.getAmount());
+        prepStm.setDate(4, Date.valueOf(foodItem.getExpireDate()));
+        prepStm.execute();
+        int foodItemId = prepStm.getGeneratedKeys().getInt(1);
+
+        HistoryDBHandler.insertHistory(new History(
+                foodItemId,
+                LocalDateTime.now(),
+                foodItem.getAmount()
+        ));
     }
 
     /**
@@ -50,20 +51,22 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
     static LinkedList<FoodItem> getFoodItems(String name) {
         try{
             c = DBConnect.getConnection();
-
-            prepStm = c.prepareStatement("SELECT * FROM FoodItem WHERE amount > 0 AND name = ?" +
-                    "ORDER BY expireDate");
-            prepStm.setString(1,name);
-
-            ResultSet rs = prepStm.executeQuery();
-
-            return getFoodItemObjectListFrom(rs);
+            return getFoodItemsQuery(name);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }finally {
             close();
         }
+    }
+
+    private static LinkedList<FoodItem> getFoodItemsQuery(String name) throws SQLException {
+        prepStm = c.prepareStatement("SELECT * FROM FoodItem WHERE amount > 0 AND name = ?" +
+                "ORDER BY expireDate");
+        prepStm.setString(1,name);
+        ResultSet rs = prepStm.executeQuery();
+
+        return getFoodItemObjectListFrom(rs);
     }
 
     /**
@@ -73,16 +76,20 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
     static LinkedList<FoodItem> getAllExistingFoodItems() {
         try{
             c = DBConnect.getConnection();
-            prepStm = c.prepareStatement("SELECT * FROM FoodItem WHERE amount > 0");
-            ResultSet rs = prepStm.executeQuery();
-
-            return  getFoodItemObjectListFrom(rs);
+            return getAllExistingFoodItemsQuery();
         } catch (Exception e) {
             System.out.println("Error at getAllExistingFoodItems " + e.getMessage());
             return null;
         }finally {
             close();
         }
+    }
+
+    private static LinkedList<FoodItem> getAllExistingFoodItemsQuery() throws SQLException {
+        prepStm = c.prepareStatement("SELECT * FROM FoodItem WHERE amount > 0");
+        ResultSet rs = prepStm.executeQuery();
+
+        return  getFoodItemObjectListFrom(rs);
     }
 
     /**
@@ -95,23 +102,26 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
         try {
             c = DBConnect.getConnection();
 
-            prepStm = c.prepareStatement("UPDATE FoodItem SET amount = amount + ?  WHERE id = ?");
-            prepStm.setInt(1, amount);
-            prepStm.setInt(2, foodItem.getFoodItemId());
-            prepStm.execute();
-
+            changeFoodItemAmountQuery(foodItem, amount);
             HistoryDBHandler.insertHistory(new History(
                     foodItem.getFoodItemId(),
                     LocalDateTime.now(),
                     amount
             ));
-
         }catch (Exception e) {
             e.printStackTrace();
         }finally {
             close();
         }
     }
+
+    private static void changeFoodItemAmountQuery(FoodItem foodItem, int amount) throws SQLException {
+        prepStm = c.prepareStatement("UPDATE FoodItem SET amount = amount + ?  WHERE id = ?");
+        prepStm.setInt(1, amount);
+        prepStm.setInt(2, foodItem.getFoodItemId());
+        prepStm.execute();
+    }
+
     /**
      * Returns all FoodItems in the database that are used up (amount == 0)
      * @return A LinkedList with all used up FoodItems
@@ -119,8 +129,7 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
     static LinkedList<FoodItem> getAllUsedUpFoodItems() {
         try{
             c = DBConnect.getConnection();
-            prepStm = c.prepareStatement("SELECT * FROM FoodItem WHERE amount = 0");
-            ResultSet rs = prepStm.executeQuery();
+            ResultSet rs = getAllUsedUpFoodItemsQuery();
 
             return getFoodItemObjectListFrom(rs);
         } catch (Exception e) {
@@ -129,6 +138,11 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
         }finally {
             close();
         }
+    }
+
+    private static ResultSet getAllUsedUpFoodItemsQuery() throws SQLException {
+        prepStm = c.prepareStatement("SELECT * FROM FoodItem WHERE amount = 0");
+        return prepStm.executeQuery();
     }
 
     private static LinkedList<FoodItem> getFoodItemObjectListFrom(ResultSet rs) throws SQLException {

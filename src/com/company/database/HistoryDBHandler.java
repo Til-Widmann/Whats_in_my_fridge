@@ -16,18 +16,21 @@ public class HistoryDBHandler extends SQLiteDBHandler{
     static void insertHistory(History history) {
         try {
             c = DBConnect.getConnection();
-
-            prepStm = c.prepareStatement("INSERT INTO History VALUES (?, ?, ?, ?)");
-            prepStm.setInt(2, history.getFoodItemid());
-            prepStm.setTimestamp(3, Timestamp.valueOf(history.getUseDate()));
-            prepStm.setInt(4, history.getAmount());
-            prepStm.execute();
+            insertHistoryQuery(history);
 
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
             close();
         }
+    }
+
+    private static void insertHistoryQuery(History history) throws SQLException {
+        prepStm = c.prepareStatement("INSERT INTO History VALUES (?, ?, ?, ?)");
+        prepStm.setInt(2, history.getFoodItemid());
+        prepStm.setTimestamp(3, Timestamp.valueOf(history.getUseDate()));
+        prepStm.setInt(4, history.getAmount());
+        prepStm.execute();
     }
 
     /**
@@ -38,19 +41,20 @@ public class HistoryDBHandler extends SQLiteDBHandler{
     static LinkedList<History> getHistoryOf(int foodItemId) {
         try {
             c = DBConnect.getConnection();
-
-            prepStm = c.prepareStatement("SELECT * FROM History WHERE FoodItemId = ? ORDER BY useDate");
-            prepStm.setInt(1, foodItemId);
-            ResultSet rs = prepStm.executeQuery();
-
+            ResultSet rs = getHistoryOfQuery(foodItemId);
             return getHistoryObjectListFrom(rs);
-
         }catch (Exception e) {
             e.printStackTrace();
             return null;
         }finally {
             close();
         }
+    }
+
+    private static ResultSet getHistoryOfQuery(int foodItemId) throws SQLException {
+        prepStm = c.prepareStatement("SELECT * FROM History WHERE FoodItemId = ? ORDER BY useDate");
+        prepStm.setInt(1, foodItemId);
+        return prepStm.executeQuery();
     }
 
     private static LinkedList<History> getHistoryObjectListFrom(ResultSet rs) throws SQLException {

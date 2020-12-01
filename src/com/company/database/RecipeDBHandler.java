@@ -16,18 +16,22 @@ public class RecipeDBHandler extends SQLiteDBHandler{
     static int insertRecipe(Recipe recipe) {
         try {
             c = DBConnect.getConnection();
-
-            prepStm = c.prepareStatement("INSERT INTO Recipe (id, name) VALUES (?, ?)");
-            prepStm.setString(2, recipe.getName());
-            prepStm.execute();
-
-            return  prepStm.getGeneratedKeys().getInt(1);
+            int recipeId = insertRecipeQuery(recipe);
+            return  recipeId;
         } catch (Exception e) {
             e.printStackTrace();
             return -1;
         }finally {
             close();
         }
+    }
+
+    private static int insertRecipeQuery(Recipe recipe) throws SQLException {
+        prepStm = c.prepareStatement("INSERT INTO Recipe (id, name) VALUES (?, ?)");
+        prepStm.setString(2, recipe.getName());
+        prepStm.execute();
+
+        return prepStm.getGeneratedKeys().getInt(1);
     }
 
     /**
@@ -39,11 +43,8 @@ public class RecipeDBHandler extends SQLiteDBHandler{
         try {
             c = DBConnect.getConnection();
 
-            prepStm = c.prepareStatement("SELECT * FROM Recipe WHERE name = ?");
-            prepStm.setString(1, name);
-            ResultSet rs = prepStm.executeQuery();
-
-            return getRecipeFromResultSet(rs);
+            ResultSet rs = getRecipeQuery(name);
+            return getRecipeFrom(rs).getFirst();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -52,9 +53,22 @@ public class RecipeDBHandler extends SQLiteDBHandler{
         }
     }
 
-    private static Recipe getRecipeFromResultSet(ResultSet rs) throws SQLException {
+    private static ResultSet getRecipeQuery(String name) throws SQLException {
+        prepStm = c.prepareStatement("SELECT * FROM Recipe WHERE name = ?");
+        prepStm.setString(1, name);
+        return prepStm.executeQuery();
+    }
 
-        return new Recipe(rs.getInt(1), rs.getString(2));
+    private static LinkedList<Recipe> getRecipeFrom(ResultSet rs) throws SQLException {
+
+        LinkedList<Recipe> recipes = new LinkedList<>();
+        while (rs.next())  {
+            recipes.add(new Recipe(
+                    rs.getInt("id"),
+                    rs.getString("name")
+            ));
+        }
+        return recipes;
     }
 
     /**
@@ -65,23 +79,19 @@ public class RecipeDBHandler extends SQLiteDBHandler{
         try {
             c = DBConnect.getConnection();
 
-            prepStm = c.prepareStatement("SELECT * FROM Recipe");
-            ResultSet rs = prepStm.executeQuery();
-
-            LinkedList<Recipe> recipes = new LinkedList<>();
-            while (rs.next())  {
-                recipes.add(new Recipe(
-                        rs.getInt("id"),
-                        rs.getString("name")
-                ));
-            }
-            return recipes;
+            ResultSet rs = getAllRecipesQuery();
+            return getRecipeFrom(rs);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }finally {
             close();
         }
+    }
+
+    private static ResultSet getAllRecipesQuery() throws SQLException {
+        prepStm = c.prepareStatement("SELECT * FROM Recipe");
+        return prepStm.executeQuery();
     }
 
 }
