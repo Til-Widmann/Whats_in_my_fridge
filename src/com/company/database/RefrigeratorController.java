@@ -123,7 +123,28 @@ public class RefrigeratorController {
 
 
     public enum SelectFoodItem {
-        ALL,USED_UP,EXISTING
+        ALL{
+            @Override
+            public List<FoodItem> getFoodItemWithMode(){
+                LinkedList<FoodItem> list = getAllExistingFoodItems();
+                assert list != null;
+                list.addAll(getAllUsedUpFoodItems());
+                return list;
+            }
+        },
+        USED_UP{
+            @Override
+            public List<FoodItem> getFoodItemWithMode() {
+                return getAllUsedUpFoodItems();
+            }
+        },
+        EXISTING {
+            @Override
+            public List<FoodItem> getFoodItemWithMode() {
+                return getAllExistingFoodItems();
+            }
+        };
+        public abstract List<FoodItem> getFoodItemWithMode();
     }
     /**
      * Returns foodItems in database
@@ -133,23 +154,8 @@ public class RefrigeratorController {
      * @return A list of foodItems in database
      */
     public static List<FoodItem> getAllFoodItems(SelectFoodItem mode){
-        LinkedList<FoodItem> list;
-        switch (mode){
-            case EXISTING:
-                list = getAllExistingFoodItems();
-                break;
-            case USED_UP:
-                list = getAllUsedUpFoodItems();
-                break;
-            case ALL:
-                list = getAllExistingFoodItems();
-                assert list != null;
-                list.addAll(getAllUsedUpFoodItems());
-                break;
-            default:
-                return null;
-        }
-        return list;
+
+        return SelectFoodItem.valueOf(mode.name()).getFoodItemWithMode();
     }
 
     /**
