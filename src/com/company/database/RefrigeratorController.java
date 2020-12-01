@@ -24,7 +24,7 @@ public class RefrigeratorController {
      *                 [1] amount
      *                 [2] expireDate
      */
-    public void addFoodItem(String[] foodItem) {
+    public static void addFoodItem(String[] foodItem) {
 
         int amount =  Integer.parseInt(foodItem[1]);
 
@@ -40,7 +40,7 @@ public class RefrigeratorController {
      * @param id FoodItem id
      * @return  FoodItem with equal id or null if there is no such item
      */
-    public FoodItem getFoodItemFromId(int id) {
+    public static FoodItem getFoodItemFromId(int id) {
         List<FoodItem> foodItems = getAllFoodItems(SelectFoodItem.ALL);
         for(FoodItem item : foodItems) {
             if (item.getFoodItemId() == id)
@@ -55,7 +55,7 @@ public class RefrigeratorController {
      * @param amount    amount that should be changed (can be negative)
      * @return  true if there is enough in the storage so the change is successfull
      */
-    public boolean removeAmountOfFoodItemIfAvailable(String name, int amount) {
+    public static boolean removeAmountOfFoodItemIfAvailable(String name, int amount) {
 
         List<FoodItem> matchingFoodItems = getFoodItems(name);
 
@@ -87,7 +87,7 @@ public class RefrigeratorController {
      * @param stringDatum String datum formated in (dd-mm-yyyy),(dd/mm/yyyy) and (dd.mm.yyyy)
      * @return LocalDate format
      */
-    private LocalDate dateFormatter(String stringDatum){
+    private static LocalDate dateFormatter(String stringDatum){
         String[] stringDate = stringDatum.split("[-./]");
 
         return LocalDate.of(
@@ -100,7 +100,7 @@ public class RefrigeratorController {
      * Returns all expired Food
      * @return List of expired Food in storage
      */
-    public List<FoodItem> expiredFood() {
+    public static List<FoodItem> expiredFood() {
         return expiresInLessThen(0);
     }
 
@@ -109,7 +109,7 @@ public class RefrigeratorController {
      * @param days  max days in which it will expire
      * @return list of food that will expire in given timeframe
      */
-    public List<FoodItem> expiresInLessThen(int days){
+    public static List<FoodItem> expiresInLessThen(int days){
         SQLiteDBHandler db = new SQLiteDBHandler();
 
         LocalDate maxDate = LocalDate.now().plusDays(days);
@@ -132,7 +132,7 @@ public class RefrigeratorController {
      *              Mode ALL = Both Food that is or was in the refrigerator
      * @return A list of foodItems in database
      */
-    public List<FoodItem> getAllFoodItems(SelectFoodItem mode){
+    public static List<FoodItem> getAllFoodItems(SelectFoodItem mode){
         LinkedList<FoodItem> list;
         switch (mode){
             case EXISTING:
@@ -157,7 +157,7 @@ public class RefrigeratorController {
      * @param id id of FoodItem
      * @return  list of all matching history events
      */
-    public LinkedList <History> getHistoryFromId(int id) {
+    public static LinkedList <History> getHistoryFromId(int id) {
         return HistoryDBHandler.getHistoryOf(id);
     }
 
@@ -167,7 +167,7 @@ public class RefrigeratorController {
      * @param amount amount that should be left
      * @return  true if there is enough left
      */
-    public boolean amountAvailable(String name, int amount) {
+    public static boolean amountAvailable(String name, int amount) {
         List<FoodItem> foodItems = getAllFoodItems(SelectFoodItem.EXISTING);
 
         int availableAmount = foodItems.stream()

@@ -23,8 +23,6 @@ public class HistoryDBHandler extends SQLiteDBHandler{
             prepStm.setInt(4, history.getAmount());
             prepStm.execute();
 
-            //return prepStm.getGeneratedKeys().getInt(1);
-
         } catch (Exception e) {
             e.printStackTrace();
         }finally {

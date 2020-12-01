@@ -20,8 +20,7 @@ public class CookingController {
      * @param name name of recipe
      * @param ingredients  a map of Ingredients that corrospond to this Recipe
      */
-    public void addRecipe(String name, Map<String, Integer> ingredients) {
-
+    public static void addRecipe(String name, Map<String, Integer> ingredients) {
         int recipeId = insertRecipe(new Recipe(name));
 
         ingredients.forEach((key, value) -> insertIngredient(new Ingredient(
@@ -32,10 +31,10 @@ public class CookingController {
     }
 
     /**
-     * Get all Recipes which are cookable witrh stored FoodItems
+     * Get all Recipes which are cookable with stored FoodItems
      * @return List of all cookable Recipes
      */
-    public List<Recipe> cookableRecipes() {
+    public static List<Recipe> cookableRecipes() {
         List<Recipe> recipes = getAllRecipes();
         RefrigeratorController refrigeratorController = new RefrigeratorController();
         List<Recipe> cookableRecipes = new LinkedList<>();
@@ -61,7 +60,7 @@ public class CookingController {
      * @param name Recipe name to be cooked
      * @return returns if Recipe has been cooked correctly
      */
-    public boolean cookThisRecipe(String name) {
+    public static boolean cookThisRecipe(String name) {
         Recipe recipe = getRecipe(name);
         if (recipe == null)
             return false;
