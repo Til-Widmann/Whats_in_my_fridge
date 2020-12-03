@@ -63,11 +63,11 @@ public class RefrigeratorController {
 
         for (FoodItem item : matchingFoodItems) {
             if (item.getAmount() >= amount) {
-                changeFoodItemAmount(item, -amount);
+                changeFoodItemAmountTo(item, -amount);
                 break;
             }else {
                 amount -= item.getAmount();
-                changeFoodItemAmount(item, -item.getAmount());
+                changeFoodItemAmountTo(item, -item.getAmount());
             }
         }
         return true;
@@ -154,7 +154,6 @@ public class RefrigeratorController {
      * @return A list of foodItems in database
      */
     public static List<FoodItem> getAllFoodItems(SelectFoodItem mode){
-
         return SelectFoodItem.valueOf(mode.name()).getFoodItemWithMode();
     }
 

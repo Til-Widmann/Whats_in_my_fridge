@@ -71,4 +71,21 @@ public class IngredientDBHandler extends SQLiteDBHandler{
         }
         return ingredients;
     }
+    static void removeIngredients(String name){
+        try {
+            c = DBConnect.getConnection();
+
+            removeIngredientQuery(name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            close();
+        }
+    }
+
+    private static void removeIngredientQuery(String name) throws SQLException{
+        prepStm = c.prepareStatement("DELETE FROM Ingredient WHERE name = ?");
+        prepStm.setString(1, name);
+        prepStm.execute();
+    }
 }

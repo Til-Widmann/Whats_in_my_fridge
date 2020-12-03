@@ -98,11 +98,11 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
      * @param foodItem The Food item that is to be changed.
      * @param amount the amount that is added to the FoodItem (can be negative).
      */
-    static void changeFoodItemAmount(FoodItem foodItem, int amount) {
+    static void changeFoodItemAmountTo(FoodItem foodItem, int amount) {
         try {
             c = DBConnect.getConnection();
 
-            changeFoodItemAmountQuery(foodItem, amount);
+            changeFoodItemAmountToQuery(foodItem, amount);
             HistoryDBHandler.insertHistory(new History(
                     foodItem.getFoodItemId(),
                     LocalDateTime.now(),
@@ -115,8 +115,8 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
         }
     }
 
-    private static void changeFoodItemAmountQuery(FoodItem foodItem, int amount) throws SQLException {
-        prepStm = c.prepareStatement("UPDATE FoodItem SET amount = amount + ?  WHERE id = ?");
+    private static void changeFoodItemAmountToQuery(FoodItem foodItem, int amount) throws SQLException {
+        prepStm = c.prepareStatement("UPDATE FoodItem SET amount = ?  WHERE id = ?");
         prepStm.setInt(1, amount);
         prepStm.setInt(2, foodItem.getFoodItemId());
         prepStm.execute();
@@ -156,5 +156,46 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
             ));
         }
         return foodItems;
+    }
+    static void removeFoodItem(String name){
+        try {
+            c = DBConnect.getConnection();
+
+            LinkedList<Integer> rs = removeFoodItemQuery(name);
+            removeAssociatedHistorys(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            close();
+        }
+    }
+    private static LinkedList<Integer> removeFoodItemQuery(String name) throws SQLException{
+        LinkedList<Integer> resultSet = getEffectedFoodItemIds(name);
+
+        prepStm = c.prepareStatement("DELETE FROM FoodItem WHERE name= ?");
+        prepStm.setString(1, name);
+        prepStm.execute();
+        return resultSet;
+    }
+
+    private static LinkedList<Integer> getEffectedFoodItemIds(String name) throws SQLException {
+        ResultSet rs = getEffectedFoodItemIdsQuery(name);
+        LinkedList<Integer> idList = new LinkedList<>();
+        while (rs.next()){
+            idList.add(rs.getInt(1));
+        }
+        return idList;
+    }
+
+    private static ResultSet getEffectedFoodItemIdsQuery(String name) throws SQLException {
+        prepStm = c.prepareStatement("SELECT * FROM FoodItem WHERE name=?");
+        prepStm.setString(1, name);
+        return prepStm.executeQuery();
+    }
+
+    private static void removeAssociatedHistorys(LinkedList<Integer> idList) throws SQLException{
+        idList.forEach(
+                HistoryDBHandler::removeHistory
+        );
     }
 }

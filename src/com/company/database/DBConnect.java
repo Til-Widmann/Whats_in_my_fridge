@@ -17,7 +17,6 @@ import java.sql.DriverManager;
             if (c == null)
             Class.forName("org.sqlite.JDBC");
 
-
             c = DriverManager
                     .getConnection( "jdbc:sqlite:database.db");
 

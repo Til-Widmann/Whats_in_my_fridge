@@ -94,4 +94,23 @@ public class RecipeDBHandler extends SQLiteDBHandler{
         return prepStm.executeQuery();
     }
 
+    static void removeRecipe(String name){
+        try {
+            c = DBConnect.getConnection();
+
+            removeRecipeQuery(name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            close();
+        }
+    }
+
+    private static void removeRecipeQuery(String name) throws SQLException{
+        prepStm = c.prepareStatement("DELETE FROM Recipe WHERE name = ?");
+        prepStm.setString(1, name);
+        prepStm.execute();
+    }
+
+
 }

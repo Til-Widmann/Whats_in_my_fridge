@@ -36,23 +36,23 @@ public class CookingController {
      */
     public static List<Recipe> cookableRecipes() {
         List<Recipe> recipes = getAllRecipes();
-        RefrigeratorController refrigeratorController = new RefrigeratorController();
         List<Recipe> cookableRecipes = new LinkedList<>();
 
         for (Recipe recipe: recipes) {
-            List<Ingredient> ingredients = getAllIngredientsOf(recipe.getRecipeId());
-            boolean cookable = true;
-            for (Ingredient ingredient: ingredients ) {
-                if (!refrigeratorController.amountAvailable(ingredient.getName(), ingredient.getAmount())) {
-                    cookable = false;
-                    break;
-                }
-            }
-            if (cookable)
+            if (isCookable(recipe))
                 cookableRecipes.add(recipe);
         }
-
         return cookableRecipes;
+    }
+
+    private static boolean isCookable(Recipe recipe) {
+        List<Ingredient> ingredients = getAllIngredientsOf(recipe.getRecipeId());
+        for (Ingredient ingredient: ingredients ) {
+            if (!RefrigeratorController.amountAvailable(ingredient.getName(), ingredient.getAmount())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -64,11 +64,10 @@ public class CookingController {
         Recipe recipe = getRecipe(name);
         if (recipe == null)
             return false;
-        RefrigeratorController refrigeratorController = new RefrigeratorController();
 
         List<Ingredient> ingredients = getAllIngredientsOf(recipe.getRecipeId());
         for (Ingredient ingredient : ingredients) {
-            if (!refrigeratorController.removeAmountOfFoodItemIfAvailable(ingredient.getName(), ingredient.getAmount()))
+            if (!RefrigeratorController.removeAmountOfFoodItemIfAvailable(ingredient.getName(), ingredient.getAmount()))
                 return false;
         }
         return true;

@@ -100,12 +100,10 @@ public class UIController {
         while (true){
             System.out.println("Name der Zutat: ");
             nameOfIngredient = scanner.nextLine();
-            if (nameOfIngredient.equals("end"))
-                break;
+            if (nameOfIngredient.equals("end")) break;
             System.out.println("Menge in Gramm:");
             String amount = scanner.next();
-            if (amount.equals("end"))
-                break;
+            if (amount.equals("end")) break;
             ingredients.put(nameOfIngredient, Integer.parseInt(amount));
             scanner.nextLine();
         }

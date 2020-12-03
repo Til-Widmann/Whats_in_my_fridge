@@ -7,6 +7,7 @@
       </element>
       <element id="module-output" name="Whats_in_my_fridge" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../sqlite-jdbc-3.32.3.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/sqlite-jdbc-3.32.3.2.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

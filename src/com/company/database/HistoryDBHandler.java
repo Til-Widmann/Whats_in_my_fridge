@@ -69,4 +69,21 @@ public class HistoryDBHandler extends SQLiteDBHandler{
         }
         return histories;
     }
+    static void removeHistory(int foodItemId){
+        try {
+            c = DBConnect.getConnection();
+
+            removeHistoryQuery(foodItemId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            close();
+        }
+    }
+
+    private static void removeHistoryQuery(int foodItemId) throws SQLException{
+        prepStm = c.prepareStatement("DELETE FROM History WHERE FoodItemId= ?");
+        prepStm.setInt(1, foodItemId);
+        prepStm.execute();
+    }
 }
