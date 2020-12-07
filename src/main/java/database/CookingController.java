@@ -1,12 +1,12 @@
-package com.company.database;
+package main.java.database;
 
-import com.company.database.dataObjects.Ingredient;
-import com.company.database.dataObjects.Recipe;
+import main.java.database.dataObjects.Ingredient;
+import main.java.database.dataObjects.Recipe;
 
 import java.util.*;
 
-import static com.company.database.IngredientDBHandler.*;
-import static com.company.database.RecipeDBHandler.*;
+import static main.java.database.IngredientDBHandler.*;
+import static main.java.database.RecipeDBHandler.*;
 
 /**
  * @author Til-W

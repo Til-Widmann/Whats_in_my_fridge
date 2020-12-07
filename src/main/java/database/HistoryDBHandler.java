@@ -1,6 +1,6 @@
-package com.company.database;
+package main.java.database;
 
-import com.company.database.dataObjects.History;
+import main.java.database.dataObjects.History;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

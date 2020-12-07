@@ -1,13 +1,14 @@
-package com.company.database;
+package main.java.database;
 
-import com.company.database.dataObjects.FoodItem;
-import com.company.database.dataObjects.History;
+import main.java.database.dataObjects.FoodItem;
+import main.java.database.dataObjects.History;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.company.database.FoodItemDBHandler.*;
+import static main.java.database.FoodItemDBHandler.*;
 
 /**
  * @author Til-W
@@ -24,14 +25,19 @@ public class RefrigeratorController {
      *                 [1] amount
      *                 [2] expireDate
      */
-    public static void addFoodItem(String[] foodItem) {
+    public static void addFoodItemWithHistory(String[] foodItem) {
 
         int amount =  Integer.parseInt(foodItem[1]);
 
-        insertFoodItem(new FoodItem(
+        int foodItemId = insertFoodItem(new FoodItem(
                 foodItem[0],
                 amount,
                 dateFormatter(foodItem[2])
+        ));
+        HistoryDBHandler.insertHistory(new History(
+                foodItemId,
+                LocalDateTime.now(),
+                amount
         ));
     }
 
@@ -63,14 +69,20 @@ public class RefrigeratorController {
 
         for (FoodItem item : matchingFoodItems) {
             if (item.getAmount() >= amount) {
-                changeFoodItemAmountTo(item, -amount);
+                changeFoodItemAndHistory(amount, item);
                 break;
             }else {
                 amount -= item.getAmount();
-                changeFoodItemAmountTo(item, -item.getAmount());
+                changeFoodItemAndHistory(item.getAmount(), item);
             }
         }
         return true;
+    }
+
+    private static void changeFoodItemAndHistory(int amount, FoodItem item) {
+        changeFoodItemAmountTo(item.getFoodItemId(), -amount);
+        History history = new History(item.getFoodItemId(), LocalDateTime.now(), amount);
+        HistoryDBHandler.insertHistory(history);
     }
 
     private static boolean checkIfAmountIsAvailable(int amount, List<FoodItem> matchingFoodItems) {

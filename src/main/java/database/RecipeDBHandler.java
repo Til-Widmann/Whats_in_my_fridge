@@ -1,12 +1,14 @@
-package com.company.database;
+package main.java.database;
 
-import com.company.database.dataObjects.Recipe;
+import main.java.database.dataObjects.Recipe;
+import main.java.database.DBConnect;
+import main.java.database.SQLiteDBHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
-public class RecipeDBHandler extends SQLiteDBHandler{
+public class RecipeDBHandler extends SQLiteDBHandler {
 
     /**
      * Inserts a new Recipe to the databse.

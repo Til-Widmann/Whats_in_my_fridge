@@ -1,4 +1,4 @@
-package com.company.database.dataObjects;
+package main.java.database.dataObjects;
 
 import java.time.LocalDate;
 /**

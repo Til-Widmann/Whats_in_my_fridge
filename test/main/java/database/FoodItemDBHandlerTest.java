@@ -1,9 +1,7 @@
-package com.company.database;
+package main.java.database;
 
-import com.company.database.dataObjects.FoodItem;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import main.java.database.dataObjects.FoodItem;
+import org.junit.jupiter.api.*;
 
 import java.time.LocalDate;
 import java.util.LinkedList;
@@ -12,15 +10,29 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FoodItemDBHandlerTest {
     String testFoodName = "TestFood";
+    static LinkedList<FoodItem> savedDBState;
+    LocalDate time = LocalDate.ofEpochDay(20000);
+    @BeforeAll
+    static void beforeAll() {
+        savedDBState = new LinkedList<FoodItem>();
+        savedDBState.addAll(FoodItemDBHandler.getAllExistingFoodItems());
+        savedDBState.addAll(FoodItemDBHandler.getAllUsedUpFoodItems());
+        savedDBState.forEach(a -> FoodItemDBHandler.removeFoodItem(a.getName()));
+    }
+
+    @AfterAll
+    static void afterAll() {
+        savedDBState.forEach(a -> FoodItemDBHandler.insertFoodItem(a));
+    }
 
     @BeforeEach
     void setUp() {
 
-        LocalDate time = LocalDate.now();
-        FoodItem foodItem = new FoodItem(-1, testFoodName, 500, time);
+
+        FoodItem foodItem = new FoodItem(testFoodName, 500, time);
         FoodItemDBHandler.insertFoodItem(foodItem);
 
-        FoodItem usedUpFoodItem = new FoodItem(-2, testFoodName,0,time);
+        FoodItem usedUpFoodItem = new FoodItem(testFoodName,0,time);
         FoodItemDBHandler.insertFoodItem(usedUpFoodItem);
     }
 
@@ -31,7 +43,11 @@ class FoodItemDBHandlerTest {
 
     @Test
     void insertFoodItem() {
-        assertEquals(1, FoodItemDBHandler.getAllExistingFoodItems().size());
+
+        FoodItem foodItem = FoodItemDBHandler.getAllExistingFoodItems().getFirst();
+        assertEquals(testFoodName, foodItem.getName());
+        assertEquals(500, foodItem.getAmount());
+        assertEquals(time, foodItem.getExpireDate());
     }
 
     @Test
@@ -47,7 +63,8 @@ class FoodItemDBHandlerTest {
     @Test
     void changeFoodItemAmount() {
         FoodItem foodItem = FoodItemDBHandler.getFoodItems(testFoodName).getFirst();
-        FoodItemDBHandler.changeFoodItemAmountTo(foodItem, 0);
+        FoodItemDBHandler.changeFoodItemAmountTo(foodItem.getFoodItemId(), 0);
+
         assertEquals(2, FoodItemDBHandler.getAllUsedUpFoodItems().size());
     }
 

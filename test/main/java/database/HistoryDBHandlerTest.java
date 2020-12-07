@@ -1,14 +1,11 @@
-package com.company.database;
+package main.java.database;
 
-import com.company.database.dataObjects.FoodItem;
-import com.company.database.dataObjects.History;
+import main.java.database.dataObjects.History;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,6 +29,7 @@ class HistoryDBHandlerTest {
                 100
         ));
     }
+
     @AfterEach
     void tearDown() {
         HistoryDBHandler.removeHistory(testSaladId);

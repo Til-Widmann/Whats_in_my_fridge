@@ -1,10 +1,9 @@
-package com.company.ui;
+package main.java.ui;
 
-import com.company.database.*;
 import java.util.*;
 
-import static com.company.database.CookingController.*;
-import static com.company.database.RefrigeratorController.*;
+import static main.java.database.CookingController.*;
+import static main.java.database.RefrigeratorController.*;
 
 /**
  * @author Til-W
@@ -118,7 +117,7 @@ public class UIController {
         param[1] = scanner.next();
         System.out.println("Ablaufdatum:    ");
         param[2] = scanner.next();
-        addFoodItem(param);
+        addFoodItemWithHistory(param);
         System.out.println("Done");
     }
 }

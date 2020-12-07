@@ -1,12 +1,10 @@
-package com.company.database;
+package main.java.database;
 
-import com.company.database.dataObjects.FoodItem;
-import com.company.database.dataObjects.History;
+import main.java.database.dataObjects.FoodItem;
 
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.LinkedList;
 
 public class FoodItemDBHandler extends SQLiteDBHandler{
@@ -16,30 +14,26 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
      * @param foodItem The FoodItem that is to be stored in the database.
      * @return A int of the Auto-generated id in the database or -1 in case of a database Error.
      */
-    static void insertFoodItem(FoodItem foodItem) {
+    static int insertFoodItem(FoodItem foodItem) {
         try {
             c = DBConnect.getConnection();
-            insertFoodItemQuery(foodItem);
+            return insertFoodItemQuery(foodItem);
         }catch (Exception e) {
             e.printStackTrace();
+            return -1;
         }finally {
             close();
+
         }
     }
 
-    private static void insertFoodItemQuery(FoodItem foodItem) throws SQLException {
+    private static int insertFoodItemQuery(FoodItem foodItem) throws SQLException {
         prepStm = c.prepareStatement("INSERT INTO FoodItem VALUES(?, ?, ?, ?)");
         prepStm.setString(2, foodItem.getName());
         prepStm.setInt(3, foodItem.getAmount());
         prepStm.setDate(4, Date.valueOf(foodItem.getExpireDate()));
         prepStm.execute();
-        int foodItemId = prepStm.getGeneratedKeys().getInt(1);
-
-        HistoryDBHandler.insertHistory(new History(
-                foodItemId,
-                LocalDateTime.now(),
-                foodItem.getAmount()
-        ));
+        return prepStm.getGeneratedKeys().getInt(1);
     }
 
     /**
@@ -92,22 +86,11 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
         return  getFoodItemObjectListFrom(rs);
     }
 
-    /**
-     * Changes the ammount of a specific FoodItem in the database and adds.
-     * After changing the FoodItem it a History item to the database.
-     * @param foodItem The Food item that is to be changed.
-     * @param amount the amount that is added to the FoodItem (can be negative).
-     */
-    static void changeFoodItemAmountTo(FoodItem foodItem, int amount) {
+    static void changeFoodItemAmountTo(int foodItemId, int amount) {
         try {
             c = DBConnect.getConnection();
 
-            changeFoodItemAmountToQuery(foodItem, amount);
-            HistoryDBHandler.insertHistory(new History(
-                    foodItem.getFoodItemId(),
-                    LocalDateTime.now(),
-                    amount
-            ));
+            changeFoodItemAmountToQuery(foodItemId, amount);
         }catch (Exception e) {
             e.printStackTrace();
         }finally {
@@ -115,10 +98,10 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
         }
     }
 
-    private static void changeFoodItemAmountToQuery(FoodItem foodItem, int amount) throws SQLException {
+    private static void changeFoodItemAmountToQuery(int foodItemId, int amount) throws SQLException {
         prepStm = c.prepareStatement("UPDATE FoodItem SET amount = ?  WHERE id = ?");
         prepStm.setInt(1, amount);
-        prepStm.setInt(2, foodItem.getFoodItemId());
+        prepStm.setInt(2, foodItemId);
         prepStm.execute();
     }
 
@@ -193,7 +176,7 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
         return prepStm.executeQuery();
     }
 
-    private static void removeAssociatedHistorys(LinkedList<Integer> idList) throws SQLException{
+    private static void removeAssociatedHistorys(LinkedList<Integer> idList) {
         idList.forEach(
                 HistoryDBHandler::removeHistory
         );

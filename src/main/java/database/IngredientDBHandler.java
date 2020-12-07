@@ -1,6 +1,6 @@
-package com.company.database;
+package main.java.database;
 
-import com.company.database.dataObjects.Ingredient;
+import main.java.database.dataObjects.Ingredient;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -71,11 +71,11 @@ public class IngredientDBHandler extends SQLiteDBHandler{
         }
         return ingredients;
     }
-    static void removeIngredients(String name){
+    static void removeIngredients(int recipeId){
         try {
             c = DBConnect.getConnection();
 
-            removeIngredientQuery(name);
+            removeIngredientQuery(recipeId);
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
@@ -83,9 +83,9 @@ public class IngredientDBHandler extends SQLiteDBHandler{
         }
     }
 
-    private static void removeIngredientQuery(String name) throws SQLException{
-        prepStm = c.prepareStatement("DELETE FROM Ingredient WHERE name = ?");
-        prepStm.setString(1, name);
+    private static void removeIngredientQuery(int recipeId) throws SQLException{
+        prepStm = c.prepareStatement("DELETE FROM Ingredient WHERE recipeId = ?");
+        prepStm.setInt(1, recipeId);
         prepStm.execute();
     }
 }
