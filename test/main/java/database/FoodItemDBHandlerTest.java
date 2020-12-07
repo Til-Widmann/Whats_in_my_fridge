@@ -9,12 +9,16 @@ import java.util.LinkedList;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FoodItemDBHandlerTest {
-    String testFoodName = "TestFood";
-    static LinkedList<FoodItem> savedDBState;
-    LocalDate time = LocalDate.ofEpochDay(20000);
+    private final String testFoodName = "TestFood";
+    private static LinkedList<FoodItem> savedDBState;
+    private final LocalDate time = LocalDate.ofEpochDay(20000);
+
+
+
+
     @BeforeAll
     static void beforeAll() {
-        savedDBState = new LinkedList<FoodItem>();
+        savedDBState = new LinkedList<>();
         savedDBState.addAll(FoodItemDBHandler.getAllExistingFoodItems());
         savedDBState.addAll(FoodItemDBHandler.getAllUsedUpFoodItems());
         savedDBState.forEach(a -> FoodItemDBHandler.removeFoodItem(a.getName()));
@@ -23,6 +27,7 @@ class FoodItemDBHandlerTest {
     @AfterAll
     static void afterAll() {
         savedDBState.forEach(a -> FoodItemDBHandler.insertFoodItem(a));
+
     }
 
     @BeforeEach

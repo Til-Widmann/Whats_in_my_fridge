@@ -144,41 +144,18 @@ public class FoodItemDBHandler extends SQLiteDBHandler{
         try {
             c = DBConnect.getConnection();
 
-            LinkedList<Integer> rs = removeFoodItemQuery(name);
-            removeAssociatedHistorys(rs);
+            removeFoodItemQuery(name);
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
             close();
         }
     }
-    private static LinkedList<Integer> removeFoodItemQuery(String name) throws SQLException{
-        LinkedList<Integer> resultSet = getEffectedFoodItemIds(name);
+    private static void removeFoodItemQuery(String name) throws SQLException{
 
         prepStm = c.prepareStatement("DELETE FROM FoodItem WHERE name= ?");
         prepStm.setString(1, name);
         prepStm.execute();
-        return resultSet;
     }
 
-    private static LinkedList<Integer> getEffectedFoodItemIds(String name) throws SQLException {
-        ResultSet rs = getEffectedFoodItemIdsQuery(name);
-        LinkedList<Integer> idList = new LinkedList<>();
-        while (rs.next()){
-            idList.add(rs.getInt(1));
-        }
-        return idList;
-    }
-
-    private static ResultSet getEffectedFoodItemIdsQuery(String name) throws SQLException {
-        prepStm = c.prepareStatement("SELECT * FROM FoodItem WHERE name=?");
-        prepStm.setString(1, name);
-        return prepStm.executeQuery();
-    }
-
-    private static void removeAssociatedHistorys(LinkedList<Integer> idList) {
-        idList.forEach(
-                HistoryDBHandler::removeHistory
-        );
-    }
 }

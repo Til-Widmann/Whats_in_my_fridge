@@ -18,8 +18,8 @@ public class RecipeDBHandler extends SQLiteDBHandler {
     static int insertRecipe(Recipe recipe) {
         try {
             c = DBConnect.getConnection();
-            int recipeId = insertRecipeQuery(recipe);
-            return  recipeId;
+
+            return  insertRecipeQuery(recipe);
         } catch (Exception e) {
             e.printStackTrace();
             return -1;

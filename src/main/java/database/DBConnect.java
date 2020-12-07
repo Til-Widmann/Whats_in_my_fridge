@@ -14,12 +14,12 @@ import java.sql.DriverManager;
 
      static Connection getConnection()  {
         try {
-            if (c == null)
-            Class.forName("org.sqlite.JDBC");
+            if (c == null || c.isClosed()) {
+                Class.forName("org.sqlite.JDBC");
 
-            c = DriverManager
-                    .getConnection( "jdbc:sqlite:database.db");
-
+                c = DriverManager
+                        .getConnection("jdbc:sqlite:database.db");
+            }
             return c;
 
         } catch (Exception e) {
