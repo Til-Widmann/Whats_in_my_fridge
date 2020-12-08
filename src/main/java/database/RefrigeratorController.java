@@ -69,7 +69,7 @@ public class RefrigeratorController {
 
         for (FoodItem item : matchingFoodItems) {
             if (item.getAmount() >= amount) {
-                changeFoodItemAndHistory(0, item);
+                changeFoodItemAndHistory(item.getAmount() - amount, item);
                 break;
             }else {
                 amount -= item.getAmount();

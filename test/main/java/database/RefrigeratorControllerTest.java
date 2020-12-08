@@ -6,10 +6,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.naming.spi.DirObjectFactory;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,10 +67,10 @@ class RefrigeratorControllerTest {
                 1000
         ));
 
-        List<FoodItem> usedFoodItems = FoodItemDBHandler.getAllUsedUpFoodItems().stream()
+        long usedFoodItems = FoodItemDBHandler.getAllUsedUpFoodItems().stream()
                 .filter(a -> a.getName().equals(TEST_FOOD_NAME))
-                .collect(Collectors.toList());
-        assertEquals(2, usedFoodItems.size());
+                .count();
+        assertEquals(2, usedFoodItems);
 
     }
 
@@ -101,14 +99,34 @@ class RefrigeratorControllerTest {
 
     @Test
     void getAllFoodItems() {
+        FoodItem foodItem = new FoodItem(TEST_FOOD_NAME, 0, LocalDate.ofEpochDay(20000));
+        FoodItemDBHandler.insertFoodItem(foodItem);
+        testExistingFoodItems();
 
+        testUsedUpFoodItems();
+
+        testAllFoodItems();
     }
 
-    @Test
-    void getHistoryFromId() {
+    private void testAllFoodItems() {
+        List<FoodItem> allFoodItems = RefrigeratorController.getAllFoodItems(RefrigeratorController.SelectFoodItem.ALL);
+        assertEquals( 2, allFoodItems.stream()
+            .filter(a -> a.getName().equals(TEST_FOOD_NAME))
+            .count());
     }
 
-    @Test
-    void amountAvailable() {
+    private void testUsedUpFoodItems() {
+        List<FoodItem> usedUpFood = RefrigeratorController.getAllFoodItems(RefrigeratorController.SelectFoodItem.USED_UP);
+        assertEquals(1, usedUpFood.stream()
+                .filter(a -> a.getName().equals(TEST_FOOD_NAME))
+                .count());
     }
+
+    private void testExistingFoodItems() {
+        List<FoodItem> existingFood = RefrigeratorController.getAllFoodItems(RefrigeratorController.SelectFoodItem.EXISTING);
+        assertEquals(1, (int) existingFood.stream()
+                .filter(a -> a.getName().equals(TEST_FOOD_NAME))
+                .count());
+    }
+
 }
