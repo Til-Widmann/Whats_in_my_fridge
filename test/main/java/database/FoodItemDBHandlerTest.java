@@ -9,9 +9,9 @@ import java.util.LinkedList;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FoodItemDBHandlerTest {
-    private final String testFoodName = "TestFood";
+    private static final String TEST_FOOD_NAME = "TestFood";
     private static LinkedList<FoodItem> savedDBState;
-    private final LocalDate time = LocalDate.ofEpochDay(20000);
+    private static final LocalDate TIME = LocalDate.ofEpochDay(20000);
 
 
 
@@ -26,7 +26,7 @@ class FoodItemDBHandlerTest {
 
     @AfterAll
     static void afterAll() {
-        savedDBState.forEach(a -> FoodItemDBHandler.insertFoodItem(a));
+        savedDBState.forEach(FoodItemDBHandler::insertFoodItem);
 
     }
 
@@ -34,30 +34,29 @@ class FoodItemDBHandlerTest {
     void setUp() {
 
 
-        FoodItem foodItem = new FoodItem(testFoodName, 500, time);
+        FoodItem foodItem = new FoodItem(TEST_FOOD_NAME, 500, TIME);
         FoodItemDBHandler.insertFoodItem(foodItem);
 
-        FoodItem usedUpFoodItem = new FoodItem(testFoodName,0,time);
+        FoodItem usedUpFoodItem = new FoodItem(TEST_FOOD_NAME,0, TIME);
         FoodItemDBHandler.insertFoodItem(usedUpFoodItem);
     }
 
     @AfterEach
     void tearDown() {
-        FoodItemDBHandler.removeFoodItem(testFoodName);
+        FoodItemDBHandler.removeFoodItem(TEST_FOOD_NAME);
     }
 
     @Test
     void insertFoodItem() {
-
         FoodItem foodItem = FoodItemDBHandler.getAllExistingFoodItems().getFirst();
-        assertEquals(testFoodName, foodItem.getName());
+        assertEquals(TEST_FOOD_NAME, foodItem.getName());
         assertEquals(500, foodItem.getAmount());
-        assertEquals(time, foodItem.getExpireDate());
+        assertEquals(TIME, foodItem.getExpireDate());
     }
 
     @Test
     void getFoodItems() {
-        assertEquals(1, FoodItemDBHandler.getFoodItems(testFoodName).size());
+        assertEquals(1, FoodItemDBHandler.getFoodItems(TEST_FOOD_NAME).size());
     }
 
     @Test
@@ -67,7 +66,7 @@ class FoodItemDBHandlerTest {
 
     @Test
     void changeFoodItemAmount() {
-        FoodItem foodItem = FoodItemDBHandler.getFoodItems(testFoodName).getFirst();
+        FoodItem foodItem = FoodItemDBHandler.getFoodItems(TEST_FOOD_NAME).getFirst();
         FoodItemDBHandler.changeFoodItemAmountTo(foodItem.getFoodItemId(), 0);
 
         assertEquals(2, FoodItemDBHandler.getAllUsedUpFoodItems().size());
@@ -80,7 +79,7 @@ class FoodItemDBHandlerTest {
 
     @Test
     void removeFoodItem() {
-        FoodItemDBHandler.removeFoodItem(testFoodName);
+        FoodItemDBHandler.removeFoodItem(TEST_FOOD_NAME);
         LinkedList<FoodItem> foodItems = FoodItemDBHandler.getAllExistingFoodItems();
         foodItems.addAll(FoodItemDBHandler.getAllUsedUpFoodItems());
         assertEquals(0, foodItems.size());

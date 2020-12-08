@@ -1,5 +1,6 @@
 package main.java.database;
 
+import main.java.database.dataObjects.FoodItem;
 import main.java.database.dataObjects.Ingredient;
 import main.java.database.dataObjects.Recipe;
 
@@ -7,6 +8,7 @@ import java.util.*;
 
 import static main.java.database.IngredientDBHandler.*;
 import static main.java.database.RecipeDBHandler.*;
+import static main.java.database.RefrigeratorController.getAllFoodItems;
 
 /**
  * @author Til-W
@@ -48,7 +50,7 @@ public class CookingController {
     private static boolean isCookable(Recipe recipe) {
         List<Ingredient> ingredients = getAllIngredientsOf(recipe.getRecipeId());
         for (Ingredient ingredient: ingredients ) {
-            if (!RefrigeratorController.amountAvailable(ingredient.getName(), ingredient.getAmount())) {
+            if (!amountAvailable(ingredient.getName(), ingredient.getAmount())) {
                 return false;
             }
         }
@@ -71,5 +73,15 @@ public class CookingController {
                 return false;
         }
         return true;
+    }
+    private static boolean amountAvailable(String name, int amount) {
+        List<FoodItem> foodItems = getAllFoodItems(RefrigeratorController.SelectFoodItem.EXISTING);
+
+        int availableAmount = foodItems.stream()
+                .filter(a -> a.getName().equals(name))
+                .mapToInt(a -> a.getAmount())
+                .sum();
+
+        return amount <=  availableAmount;
     }
 }

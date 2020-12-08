@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CookingControllerTest {
-    public static final int AMOUNT = 500;
+    private static final int AMOUNT = 500;
     private static final String RECIPE_NAME = "Test Recipe";
-    public static final String TEST_FOOD_ITEM_NAME = "Test FoodItem";
+    private static final String TEST_FOOD_ITEM_NAME = "Test FoodItem";
 
     @BeforeEach
     void setUp() {

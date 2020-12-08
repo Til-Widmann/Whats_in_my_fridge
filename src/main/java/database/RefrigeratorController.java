@@ -80,7 +80,7 @@ public class RefrigeratorController {
     }
 
     private static void changeFoodItemAndHistory(int amount, FoodItem item) {
-        changeFoodItemAmountTo(item.getFoodItemId(), -amount);
+        changeFoodItemAmountTo(item.getFoodItemId(), amount);
         History history = new History(item.getFoodItemId(), LocalDateTime.now(), amount);
         HistoryDBHandler.insertHistory(history);
     }
@@ -89,9 +89,7 @@ public class RefrigeratorController {
         int availableAmount = matchingFoodItems.stream()
                 .mapToInt(i -> i.getAmount())
                 .sum();
-        if (amount > availableAmount)
-            return false;
-        return true;
+        return amount <= availableAmount;
     }
 
     /**
@@ -122,7 +120,6 @@ public class RefrigeratorController {
      * @return list of food that will expire in given timeframe
      */
     public static List<FoodItem> expiresInLessThen(int days){
-        SQLiteDBHandler db = new SQLiteDBHandler();
 
         LocalDate maxDate = LocalDate.now().plusDays(days);
 
@@ -178,20 +175,4 @@ public class RefrigeratorController {
         return HistoryDBHandler.getHistoryOf(id);
     }
 
-    /**
-     * Returns available amount of given food
-     * @param name name of foodItems
-     * @param amount amount that should be left
-     * @return  true if there is enough left
-     */
-    public static boolean amountAvailable(String name, int amount) {
-        List<FoodItem> foodItems = getAllFoodItems(SelectFoodItem.EXISTING);
-
-        int availableAmount = foodItems.stream()
-                .filter(a -> a.getName().equals(name))
-                .mapToInt(a -> a.getAmount())
-                .sum();
-
-        return amount <=  availableAmount;
-    }
 }
