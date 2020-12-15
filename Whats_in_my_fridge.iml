@@ -51,5 +51,15 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="sqlite-jdbc-3.32.3.21" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/ormlite-jdbc-5.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="ormlite-jdbc-5.3" level="project" />
   </component>
 </module>

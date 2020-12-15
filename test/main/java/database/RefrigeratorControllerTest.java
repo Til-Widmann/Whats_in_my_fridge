@@ -18,7 +18,7 @@ class RefrigeratorControllerTest {
     @BeforeEach
     void setUp() {
         String[] foodItem= {TEST_FOOD_NAME, String.valueOf(TEST_FOOD_AMOUNT) ,"20.10.2022"};
-        RefrigeratorController.addFoodItemWithHistory(foodItem);
+        RefrigeratorController.addFoodItemAndHistory(foodItem);
     }
 
     @AfterEach
@@ -30,7 +30,7 @@ class RefrigeratorControllerTest {
     }
     private void tearDownHelper(FoodItem foodItem) {
         HistoryDBHandler.removeHistory(foodItem.getFoodItemId());
-        FoodItemDBHandler.removeFoodItem(foodItem.getName());
+        FoodItemDBHandler.remove(foodItem.getName());
     }
 
     @Test
@@ -57,7 +57,7 @@ class RefrigeratorControllerTest {
                         TEST_FOOD_NAME,
                         1000
                 ));
-        FoodItemDBHandler.insertFoodItem(new FoodItem(
+        FoodItemDBHandler.insert(new FoodItem(
                 TEST_FOOD_NAME,
                 TEST_FOOD_AMOUNT,
                 LocalDate.ofEpochDay(20000)));
@@ -67,7 +67,7 @@ class RefrigeratorControllerTest {
                 1000
         ));
 
-        long usedFoodItems = FoodItemDBHandler.getAllUsedUpFoodItems().stream()
+        long usedFoodItems = FoodItemDBHandler.getAllUsedUp().stream()
                 .filter(a -> a.getName().equals(TEST_FOOD_NAME))
                 .count();
         assertEquals(2, usedFoodItems);
@@ -81,7 +81,7 @@ class RefrigeratorControllerTest {
                 TEST_FOOD_NAME,
                 TEST_FOOD_AMOUNT,
                 LocalDate.ofEpochDay(10000));
-        FoodItemDBHandler.insertFoodItem(foodItem);
+        FoodItemDBHandler.insert(foodItem);
         assertEquals(expiredFoodItems + 1, RefrigeratorController.expiredFood().size());
     }
     @Test
@@ -93,14 +93,14 @@ class RefrigeratorControllerTest {
                 TEST_FOOD_AMOUNT,
                 LocalDate.now().plusDays(5));
 
-        FoodItemDBHandler.insertFoodItem(foodItem);
+        FoodItemDBHandler.insert(foodItem);
         assertEquals(epieringFoodItems + 1 , RefrigeratorController.expiresInLessThen(days).size());
     }
 
     @Test
     void getAllFoodItems() {
         FoodItem foodItem = new FoodItem(TEST_FOOD_NAME, 0, LocalDate.ofEpochDay(20000));
-        FoodItemDBHandler.insertFoodItem(foodItem);
+        FoodItemDBHandler.insert(foodItem);
         testExistingFoodItems();
 
         testUsedUpFoodItems();

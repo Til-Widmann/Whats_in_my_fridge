@@ -18,9 +18,6 @@ public class UIController {
         startScanning();
     }
 
-    public enum CommandEnum{
-
-    }
     private static void startScanning() {
         System.out.println("Scanner ready");
         while (scanner.hasNext()){

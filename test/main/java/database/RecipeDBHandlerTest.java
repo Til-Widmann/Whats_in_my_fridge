@@ -28,7 +28,7 @@ class RecipeDBHandlerTest {
     void insertRecipe() {
         Recipe recipe = RecipeDBHandler.getRecipe(TEST_REZEPT);
         assertEquals(TEST_REZEPT, recipe.getName());
-        assertEquals(rezeptId, recipe.getRecipeId());
+        assertEquals(rezeptId, recipe.getId());
     }
     @Test
     void getRecipe() {

@@ -25,7 +25,7 @@ public class CookingController {
     public static void addRecipe(String name, Map<String, Integer> ingredients) {
         int recipeId = insertRecipe(new Recipe(name));
 
-        ingredients.forEach((key, value) -> insertIngredient(new Ingredient(
+        ingredients.forEach((key, value) -> insert(new Ingredient(
                 key,
                 value,
                 recipeId
@@ -48,7 +48,7 @@ public class CookingController {
     }
 
     private static boolean isCookable(Recipe recipe) {
-        List<Ingredient> ingredients = getAllIngredientsOf(recipe.getRecipeId());
+        List<Ingredient> ingredients = getAllOf(recipe.getId());
         for (Ingredient ingredient: ingredients ) {
             if (!amountAvailable(ingredient.getName(), ingredient.getAmount())) {
                 return false;
@@ -67,7 +67,7 @@ public class CookingController {
         if (recipe == null)
             return false;
 
-        List<Ingredient> ingredients = getAllIngredientsOf(recipe.getRecipeId());
+        List<Ingredient> ingredients = getAllOf(recipe.getId());
         for (Ingredient ingredient : ingredients) {
             if (!RefrigeratorController.removeAmountOfFoodItemIfAvailable(ingredient.getName(), ingredient.getAmount()))
                 return false;
