@@ -8,8 +8,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class DBHandler <T>{
-    private final Logger logger = Logger.getGlobal();
-    private final Dao<T, Integer> dao = getDao();
+     final Logger logger = Logger.getGlobal();
+    private final Dao<T, Integer> dao;
+
+
+    DBHandler(Dao<T,Integer> dao){
+        this.dao = dao;
+    }
 
     void add(T Object) {
         try {
@@ -19,7 +24,7 @@ public abstract class DBHandler <T>{
         }
     }
 
-    void update(T Object) {
+    protected void update(T Object) {
         try {
             dao.update(Object);
         }catch (Exception e) {
@@ -28,6 +33,7 @@ public abstract class DBHandler <T>{
     }
 
     ArrayList<T> getAll() {
+        dao.iterator();
         CloseableIterator<T> closeableIterator = dao.closeableIterator();
         ArrayList<T> objectArrayList = new ArrayList<>();
         try {
@@ -45,5 +51,4 @@ public abstract class DBHandler <T>{
             logger.log(Level.SEVERE, e.getMessage());
         }
     }
-    abstract Dao<T, Integer> getDao();
 }

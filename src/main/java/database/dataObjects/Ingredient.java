@@ -21,10 +21,10 @@ public class Ingredient {
 
     Ingredient() {}
 
-    public Ingredient(String name, int amount, Recipe recipeId){
+    public Ingredient(String name, int amount, Recipe recipe){
         this.name = name;
         this.amount = amount;
-        this.recipe = recipeId;
+        this.recipe = recipe;
     }
 
     public String getName() {

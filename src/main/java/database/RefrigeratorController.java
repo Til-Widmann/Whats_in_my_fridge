@@ -1,10 +1,8 @@
 package main.java.database;
 
 import main.java.database.dataObjects.FoodItem;
-import main.java.database.dataObjects.History;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -14,174 +12,76 @@ import java.util.stream.Collectors;
  *
  */
 public class RefrigeratorController {
-    FoodItemDBHandler foodItemDBHandler = new FoodItemDBHandler();
-    HistoryDBHandler historyDBHandler = new HistoryDBHandler();
 
+    private static FoodItemDBHandler foodItemDBHandler = new FoodItemDBHandler();
+    private static HistoryDBHandler historyDBHandler= new HistoryDBHandler();
 
-    public void addFoodItemAndHistory(String[] foodItemStrings) {
-
-        FoodItem foodItem = getFoodItemFromString(foodItemStrings);
-
-        foodItemDBHandler.add(foodItem);
-
-        historyDBHandler.add(createHistoryWith(foodItem));
+    public static  void addFood(String[] strings){
+        foodItemDBHandler.addFoodItemAndHistory(getFoodItemFromString(strings));
     }
-
-    private FoodItem getFoodItemFromString(String[] foodItemStrings) {
+    private static FoodItem getFoodItemFromString(String[] foodItemStrings) {
         int amount =  Integer.parseInt(foodItemStrings[1]);
         return new FoodItem(
                 foodItemStrings[0],
-                Integer.parseInt(foodItemStrings[1]),
+                amount,
                 dateFormatter(foodItemStrings[2]));
     }
-
     private static LocalDate dateFormatter(String stringDatum){
         String[] stringDate = stringDatum.split("[-./]");
-
         return LocalDate.of(
                 Integer.parseInt(stringDate[2]),
                 Integer.parseInt(stringDate[1]),
                 Integer.parseInt(stringDate[0]));
     }
 
-    private History createHistoryWith(FoodItem foodItem) {
-        return new History(
-                    foodItem,
-                    LocalDateTime.now(),
-                    foodItem.getAmount());
+
+    static boolean checkIfAmountAvailable(String name, int amount){
+        ArrayList<FoodItem> foodItems = foodItemDBHandler.getAll();
+        int availableAmount = foodItems
+                .stream()
+                .filter(a -> !a.getName().equals(name))
+                .mapToInt(FoodItem::getAmount).sum();
+        return amount >= availableAmount;
+    }
+    public static ArrayList<FoodItem> getAllFoodInFridge() {
+        return foodItemDBHandler.getAll()
+                .stream()
+                .filter(a -> a.getAmount() > 0)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+    public static ArrayList<FoodItem> getAllUsedUp(){
+        return foodItemDBHandler.getAll()
+                .stream()
+                .filter(a-> a.getAmount() <= 0)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
-
-
-    public void updateAmount(FoodItem foodItem, int amount){
-        foodItem.setAmount(amount);
-        foodItemDBHandler.update(foodItem);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public static FoodItem getFoodItemFromId(int id) {
-        List<FoodItem> foodItems = getAllFoodItems(SelectFoodItem.ALL);
-        for(FoodItem item : foodItems) {
-            if (item.getFoodItemId() == id)
-                return item;
-        }
-        return null;
-    }
-
-
-    public static boolean removeAmountOfFoodItemIfAvailable(String name, int amount) {
-
-        List<FoodItem> matchingFoodItems = getFoodItems(name);
-
-        if (!checkIfAmountIsAvailable(amount, matchingFoodItems)) return false;
-
-        for (FoodItem item : matchingFoodItems) {
-            if (item.getAmount() >= amount) {
-                changeFoodItemAndHistory(item.getAmount() - amount, item);
-                break;
-            }else {
-                amount -= item.getAmount();
-                changeFoodItemAndHistory(0, item);
-            }
-        }
-        return true;
-    }
-
-    private static void changeFoodItemAndHistory(int amount, FoodItem item) {
-        changeAmountTo(item.getFoodItemId(), amount);
-        History history = new History(item.getFoodItemId(), LocalDateTime.now(), amount);
-        HistoryDBHandler.insertHistory(history);
-    }
-
-    private static boolean checkIfAmountIsAvailable(int amount, List<FoodItem> matchingFoodItems) {
-        int availableAmount = matchingFoodItems.stream()
-                .mapToInt(i -> i.getAmount())
-                .sum();
-        return amount <= availableAmount;
-    }
-
-
-
-
-    public static List<FoodItem> expiredFood() {
+    static public List<FoodItem> expiredFood() {
         return expiresInLessThen(0);
     }
 
-
-    public static List<FoodItem> expiresInLessThen(int days){
-
+    static public ArrayList<FoodItem> expiresInLessThen(int days){
         LocalDate maxDate = LocalDate.now().plusDays(days);
-
-        return getAllFoodItems(SelectFoodItem.EXISTING)
+        return foodItemDBHandler.getAll()
                 .stream()
                 .filter(a -> a.getExpireDate().isBefore(maxDate))
                 .sorted(Comparator.comparing(FoodItem::getExpireDate))
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
+    static void removeAmountFromAllWith(String name, int amount) {
+        ArrayList<FoodItem> foodItems = foodItemDBHandler.getAll();
+        foodItems.sort(Comparator.comparing(FoodItem::getExpireDate));
+        for (FoodItem item : foodItems) {
+            if (!item.getName().equals(name)) break;
 
-    public enum SelectFoodItem {
-        ALL{
-            @Override
-            public List<FoodItem> getFoodItemWithMode(){
-                List<FoodItem> list = new LinkedList<>();
-                list.addAll(getAllExisting());
-                list.addAll(getAllUsedUp());
-                return list;
+            if (item.getAmount() < amount){
+                amount -= item.getAmount();
+                foodItemDBHandler.updateAmount(item, 0);
+            }else{
+                foodItemDBHandler.updateAmount(item, item.getAmount() - amount);
+                return;
             }
-        },
-        USED_UP{
-            @Override
-            public List<FoodItem> getFoodItemWithMode() {
-                return getAllUsedUp();
-            }
-        },
-        EXISTING {
-            @Override
-            public List<FoodItem> getFoodItemWithMode() {
-                return getAllExisting();
-            }
-        };
-        public abstract List<FoodItem> getFoodItemWithMode();
+        }
     }
-
-    public static List<FoodItem> getAllFoodItems(SelectFoodItem mode){
-        return SelectFoodItem.valueOf(mode.name()).getFoodItemWithMode();
-    }
-
-
-    public static LinkedList <History> getHistoryFromId(int id) {
-        return HistoryDBHandler.getHistoryOf(id);
-    }
-
 }

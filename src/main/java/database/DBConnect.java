@@ -47,19 +47,19 @@ import java.sql.SQLException;
         historyDao = DaoManager.createDao(connectionSource, History.class);
     }
 
-    public static Dao<FoodItem, Integer> getFoodItemDao() {
+    public Dao<FoodItem, Integer> getFoodItemDao() {
         return foodItemDao;
     }
 
-    public static Dao<Ingredient, Integer> getIngredientDao() {
+    public Dao<Ingredient, Integer> getIngredientDao() {
         return ingredientDao;
     }
 
-    public static Dao<Recipe, Integer> getRecipeDao() {
+    public Dao<Recipe, Integer> getRecipeDao() {
         return recipeDao;
     }
 
-    public static Dao<History, Integer> getHistoryDao() {
+    public Dao<History, Integer> getHistoryDao() {
         return historyDao;
     }
 }

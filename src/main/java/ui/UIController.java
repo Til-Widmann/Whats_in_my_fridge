@@ -1,5 +1,10 @@
 package main.java.ui;
 
+import main.java.database.CookBookController;
+import main.java.database.HistoryController;
+import main.java.database.dataObjects.History;
+import main.java.database.dataObjects.Recipe;
+
 import java.util.*;
 
 import static main.java.database.CookingController.*;
@@ -12,7 +17,7 @@ import static main.java.database.RefrigeratorController.*;
  */
 public class UIController {
 
-    private static Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         startScanning();
@@ -33,24 +38,22 @@ public class UIController {
                     break;
 
                 case "cookable":
-                    cookableRecipes().forEach(System.out::println);
+                    allCookableRecipes().forEach(System.out::println);
                     break;
                 case "cook":
                     System.out.println("Recipe Name:    ");
-                    if (cookThisRecipe(scanner.next())){
-                        System.out.println("Rezept erfolgreich gekocht");
-                    }else{
-                        System.out.println("Rezept nicht gefunden");
-                    }
+                    cookRecipe(new Recipe(scanner.next()));
+                    System.out.println("Rezept erfolgreich gekocht");
                     break;
                 case "showAllFood":
-                    Objects.requireNonNull(getAllFoodItems(SelectFoodItem.EXISTING))
-                            .forEach(System.out::println);
+                    System.out.println("Foood in Fridge:");
+                    getAllFoodInFridge().forEach(System.out::println);
+                    System.out.println("Food that is used up:");
+                    getAllUsedUp().forEach(System.out::println);
                     break;
 
                 case "showUsedUpFood":
-                    Objects.requireNonNull(getAllFoodItems(SelectFoodItem.USED_UP))
-                            .forEach(System.out::println);
+                    getAllUsedUp().forEach(System.out::println);
                     break;
 
                 case "showHistory":
@@ -76,8 +79,9 @@ public class UIController {
 
     private static void showHistoryCommand() {
         int id = scanner.nextInt();
-        System.out.println(getFoodItemFromId(id));
-        getHistoryFromId(id).forEach(System.out::println);
+        System.out.println(HistoryController.getFoodItemFromId(id));
+        ArrayList<History> histories = HistoryController.getHistoryFromId(id);
+        System.out.println(histories);
     }
 
     private static void addRecipeCommand() {
@@ -85,14 +89,14 @@ public class UIController {
         System.out.println("Name:           ");
         String name = scanner.nextLine();
         System.out.println("Zum beenden der Zutateneingabe \"end\" eingeben");
-        Map<String, Integer> ingredients = readIngredientsForAddRecipe();
-        addRecipe(name, ingredients);
+        HashMap<String, String> ingredients = readIngredientsForAddRecipe();
+        CookBookController.addRecipe(name, ingredients);
         System.out.println("Done");
     }
 
-    private static Map<String, Integer> readIngredientsForAddRecipe() {
-        Map<String, Integer> ingredients = new HashMap<>();
-        String nameOfIngredient = "a";
+    private static HashMap<String, String> readIngredientsForAddRecipe() {
+        HashMap<String, String> ingredients = new HashMap<>();
+        String nameOfIngredient;
         while (true){
             System.out.println("Name der Zutat: ");
             nameOfIngredient = scanner.nextLine();
@@ -100,7 +104,7 @@ public class UIController {
             System.out.println("Menge in Gramm:");
             String amount = scanner.next();
             if (amount.equals("end")) break;
-            ingredients.put(nameOfIngredient, Integer.parseInt(amount));
+            ingredients.put(nameOfIngredient, amount);
             scanner.nextLine();
         }
         return ingredients;
@@ -114,7 +118,7 @@ public class UIController {
         param[1] = scanner.next();
         System.out.println("Ablaufdatum:    ");
         param[2] = scanner.next();
-        addFoodItemWithHistory(param);
+        addFood(param);
         System.out.println("Done");
     }
 }

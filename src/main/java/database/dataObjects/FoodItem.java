@@ -4,6 +4,8 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 /**
  * @author Til-W
  * @version 1.0
@@ -48,6 +50,12 @@ import java.time.LocalDate;
         this.amount = amount;
     }
 
+    public History createHistory( ) {
+        return new History(
+                this,
+                LocalDateTime.now(),
+                getAmount());
+    }
     public String toString(){
         StringBuilder formatedFoodItem = new StringBuilder();
         formatedFoodItem.append("Id:            " + id + "\n");
@@ -58,4 +66,5 @@ import java.time.LocalDate;
 
         return formatedFoodItem.toString();
     }
+
 }
