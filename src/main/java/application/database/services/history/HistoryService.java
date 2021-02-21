@@ -1,4 +1,4 @@
-package application.database.services;
+package application.database.services.history;
 
 import application.database.model.FoodItem;
 import application.database.model.History;

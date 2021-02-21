@@ -1,6 +1,7 @@
-package application.database.services;
+package application.database.services.expire;
 
 import application.database.model.FoodItem;
+import application.database.services.foodItem.FoodItemService;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 

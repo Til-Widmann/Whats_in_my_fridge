@@ -1,4 +1,4 @@
-package application.database.services;
+package application.database.services.recipe;
 
 import application.database.dao.IngredientRepository;
 import application.database.dao.RecipeRepository;

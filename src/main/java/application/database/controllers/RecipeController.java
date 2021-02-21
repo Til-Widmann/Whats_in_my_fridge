@@ -1,7 +1,7 @@
 package application.database.controllers;
 
 import application.database.model.Recipe;
-import application.database.services.RecipeServiceImpl;
+import application.database.services.recipe.RecipeServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

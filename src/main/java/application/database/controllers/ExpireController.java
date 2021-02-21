@@ -1,7 +1,7 @@
 package application.database.controllers;
 
 import application.database.model.FoodItem;
-import application.database.services.ExpireService;
+import application.database.services.expire.ExpireService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
