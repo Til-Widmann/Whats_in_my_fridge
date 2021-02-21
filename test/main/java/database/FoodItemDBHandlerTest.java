@@ -19,14 +19,14 @@ class FoodItemDBHandlerTest {
     @BeforeAll
     static void beforeAll() {
         savedDBState = new LinkedList<>();
-        savedDBState.addAll(FoodItemDBHandler.getAllExistingFoodItems());
-        savedDBState.addAll(FoodItemDBHandler.getAllUsedUpFoodItems());
-        savedDBState.forEach(a -> FoodItemDBHandler.removeFoodItem(a.getName()));
+        savedDBState.addAll(FoodItemDBHandler.getAllExisting());
+        savedDBState.addAll(FoodItemDBHandler.getAllUsedUp());
+        savedDBState.forEach(a -> FoodItemDBHandler.remove(a.getName()));
     }
 
     @AfterAll
     static void afterAll() {
-        savedDBState.forEach(FoodItemDBHandler::insertFoodItem);
+        savedDBState.forEach(FoodItemDBHandler::insert);
 
     }
 
@@ -35,20 +35,20 @@ class FoodItemDBHandlerTest {
 
 
         FoodItem foodItem = new FoodItem(TEST_FOOD_NAME, 500, TIME);
-        FoodItemDBHandler.insertFoodItem(foodItem);
+        FoodItemDBHandler.insert(foodItem);
 
         FoodItem usedUpFoodItem = new FoodItem(TEST_FOOD_NAME,0, TIME);
-        FoodItemDBHandler.insertFoodItem(usedUpFoodItem);
+        FoodItemDBHandler.insert(usedUpFoodItem);
     }
 
     @AfterEach
     void tearDown() {
-        FoodItemDBHandler.removeFoodItem(TEST_FOOD_NAME);
+        FoodItemDBHandler.remove(TEST_FOOD_NAME);
     }
 
     @Test
     void insertFoodItem() {
-        FoodItem foodItem = FoodItemDBHandler.getAllExistingFoodItems().getFirst();
+        FoodItem foodItem = FoodItemDBHandler.getAllExisting().getFirst();
         assertEquals(TEST_FOOD_NAME, foodItem.getName());
         assertEquals(500, foodItem.getAmount());
         assertEquals(TIME, foodItem.getExpireDate());
@@ -61,27 +61,27 @@ class FoodItemDBHandlerTest {
 
     @Test
     void getAllExistingFoodItems() {
-        assertEquals(1, FoodItemDBHandler.getAllExistingFoodItems().size());
+        assertEquals(1, FoodItemDBHandler.getAllExisting().size());
     }
 
     @Test
     void changeFoodItemAmount() {
         FoodItem foodItem = FoodItemDBHandler.getFoodItems(TEST_FOOD_NAME).getFirst();
-        FoodItemDBHandler.changeFoodItemAmountTo(foodItem.getFoodItemId(), 0);
+        FoodItemDBHandler.changeAmountTo(foodItem.getFoodItemId(), 0);
 
-        assertEquals(2, FoodItemDBHandler.getAllUsedUpFoodItems().size());
+        assertEquals(2, FoodItemDBHandler.getAllUsedUp().size());
     }
 
     @Test
     void getAllUsedUpFoodItems() {
-        assertEquals(1, FoodItemDBHandler.getAllUsedUpFoodItems().size());
+        assertEquals(1, FoodItemDBHandler.getAllUsedUp().size());
     }
 
     @Test
     void removeFoodItem() {
-        FoodItemDBHandler.removeFoodItem(TEST_FOOD_NAME);
-        LinkedList<FoodItem> foodItems = FoodItemDBHandler.getAllExistingFoodItems();
-        foodItems.addAll(FoodItemDBHandler.getAllUsedUpFoodItems());
+        FoodItemDBHandler.remove(TEST_FOOD_NAME);
+        LinkedList<FoodItem> foodItems = FoodItemDBHandler.getAllExisting();
+        foodItems.addAll(FoodItemDBHandler.getAllUsedUp());
         assertEquals(0, foodItems.size());
     }
 }

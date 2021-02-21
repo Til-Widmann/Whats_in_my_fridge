@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,16 +29,16 @@ class CookingControllerTest {
 
     @AfterEach
     void tearDown() {
-        int recipeId = RecipeDBHandler.getRecipe(RECIPE_NAME).getRecipeId();
+        int recipeId = RecipeDBHandler.getRecipe(RECIPE_NAME).getId();
         RecipeDBHandler.removeRecipe(RECIPE_NAME);
-        IngredientDBHandler.removeIngredients(recipeId);
+        IngredientDBHandler.remove(recipeId);
         removeUsedFoodItems();
     }
 
     @Test
     void addRecipe() {
         Recipe recipe = RecipeDBHandler.getRecipe(RECIPE_NAME);
-        LinkedList<Ingredient> ingredient = IngredientDBHandler.getAllIngredientsOf(recipe.getRecipeId());
+        LinkedList<Ingredient> ingredient = IngredientDBHandler.getAllOf(recipe.getId());
         assertEquals(RECIPE_NAME, recipe.getName());
         assertEquals(1, ingredient.size());
         assertEquals(TEST_FOOD_ITEM_NAME, ingredient.getFirst().getName());
@@ -55,7 +54,7 @@ class CookingControllerTest {
     @Test
     void cookThisRecipe() {
         assertTrue(CookingController.cookThisRecipe(RECIPE_NAME));
-        List<FoodItem> foodItems = FoodItemDBHandler.getAllUsedUpFoodItems();
+        List<FoodItem> foodItems = FoodItemDBHandler.getAllUsedUp();
         boolean remainingAmount = foodItems.stream().anyMatch(a -> a.getName().equals(TEST_FOOD_ITEM_NAME));
 
         assertTrue(remainingAmount);
@@ -69,13 +68,13 @@ class CookingControllerTest {
                 TEST_FOOD_ITEM_NAME,
                 500,
                 LocalDate.ofEpochDay(20000));
-        FoodItemDBHandler.insertFoodItem(foodItem);
+        FoodItemDBHandler.insert(foodItem);
     }
     private void removeUsedFoodItems(){
-        List<FoodItem> foodItemId = FoodItemDBHandler.getAllUsedUpFoodItems().stream()
+        List<FoodItem> foodItemId = FoodItemDBHandler.getAllUsedUp().stream()
                 .filter(a -> a.getName().equals(TEST_FOOD_ITEM_NAME))
                 .collect(Collectors.toList());
-        FoodItemDBHandler.removeFoodItem(TEST_FOOD_ITEM_NAME);
+        FoodItemDBHandler.remove(TEST_FOOD_ITEM_NAME);
         foodItemId.forEach(a -> HistoryDBHandler.removeHistory(a.getFoodItemId()));
     }
 }
