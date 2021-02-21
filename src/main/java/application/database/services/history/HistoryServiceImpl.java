@@ -1,4 +1,4 @@
-package application.database.services;
+package application.database.services.history;
 
 import application.database.dao.HistoryRepository;
 import application.database.model.FoodItem;

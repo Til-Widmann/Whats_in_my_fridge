@@ -2,8 +2,8 @@ package application.database.controllers;
 
 import application.database.model.FoodItem;
 import application.database.model.History;
-import application.database.services.FoodItemService;
-import application.database.services.HistoryServiceImpl;
+import application.database.services.foodItem.FoodItemService;
+import application.database.services.history.HistoryServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;

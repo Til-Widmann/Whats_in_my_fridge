@@ -1,7 +1,8 @@
-package application.database.services;
+package application.database.services.foodItem;
 
 import application.database.dao.FoodItemRepository;
 import application.database.model.FoodItem;
+import application.database.services.history.HistoryService;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

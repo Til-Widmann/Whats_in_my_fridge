@@ -1,4 +1,4 @@
-package application.database.services;
+package application.database.services.recipe;
 
 import application.database.model.Recipe;
 

@@ -1,9 +1,11 @@
-package application.database.services;
+package application.database.services.cooking;
 
 import application.database.dao.IngredientRepository;
 import application.database.model.FoodItem;
 import application.database.model.Ingredient;
 import application.database.model.Recipe;
+import application.database.services.foodItem.FoodItemService;
+import application.database.services.recipe.RecipeService;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package application.database.services;
+package application.database.services.foodItem;
 
 import application.database.model.FoodItem;
 
